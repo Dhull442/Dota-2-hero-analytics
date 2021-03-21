@@ -1,0 +1,17 @@
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/ability_ids.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/ability_upgrades.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/cluster_regions.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/hero_names.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/item_ids.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/match.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/match_outcomes.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/objectives.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/patch_dates.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/player_ratings.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/players.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/player_time.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/purchase_log.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/teamfights.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/teamfights_players.csv
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/test_labels.csv 
+./pgfutter_linux_amd64 --db "project_db" --port "5432" --schema "public" --user "postgres" --pw "edutech123" csv ./archive/test_player.csv 
