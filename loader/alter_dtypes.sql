@@ -27,6 +27,10 @@ create table teamfights(
 
 copy teamfights from '/media/jay/7E5662245661DE01/sem8/DBMS/project/archive/teamfights.csv' delimiter ',' CSV HEADER;
 ;
+
+copy players from '/media/jay/7E5662245661DE01/sem8/DBMS/project/archive/players.csv' delimiter ',' CSV HEADER;
+;
+
 SELECT changedtypes('ability_ids','ability_id')
 ;
 SELECT changedtypes('ability_upgrades','ability','level','time','player_slot','match_id')
