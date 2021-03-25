@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Dota-2 Hero Analytics</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+<style>
+body,h1,h2,h3,h4,h5 {font-family: "Poppins", sans-serif}
+body {font-size:16px;}
+.w3-half img{margin-bottom:-6px;margin-top:16px;opacity:0.8;cursor:pointer}
+.w3-half img:hover{opacity:1}
+.tableFixHead          { overflow-y: auto; height: 400px; }
+.tableFixHead thead th { position: sticky; top: 0; }
+
+/* Just common table stuff. Really. */
+table  { border-collapse: collapse; width: 100%; }
+th, td { padding: 8px 16px; }
+th     { background:#eee; }
+</style>
+<body>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-red w3-collapse w3-top w3-large w3-padding" style="z-index:3;width:300px;font-weight:bold;" id="mySidebar"><br>
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
+  <div class="w3-container">
+    <h3 class="w3-padding-64"><b>Dota-2<br>Hero Analytics</b></h3>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a>
+    <a href="#updates" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Update/Add </a>
+    <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Team</a>
+
+  </div>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-container w3-top w3-hide-large w3-red w3-xlarge w3-padding">
+  <a href="javascript:void(0)" class="w3-button w3-red w3-margin-right" onclick="w3_open()">☰</a>
+  <span>Dota-2 Hero Analytics</span>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:340px;margin-right:40px">
+
+  <!-- Header -->
+  <div class="w3-container" style="margin-top:80px" id="queries">
+    <h1 class="w3-jumbo"><b>Analytics and Tools</b></h1>
+    <h1 class="w3-xxxlarge w3-text-red"><b>Showcase.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
+      and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
+       by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different heros.
+</p>
+<form action="/query" method="GET">
+  <label for="queries">Choose a Query:</label>
+  <select name="queries" id="queries">
+    <option value="q1">Query 1</option>
+    <option value="q2">Query 2</option>
+    <option value="q3">Opel</option>
+    <option value="q4">Audi</option>
+  </select>
+  <input type="submit" value="Submit">
+</form>
+<br>
+<div class="tableFixHead" id="results">
+
+  <table>
+    <thead>
+      <tr>
+        <th>TH 1</th>
+        <th>TH 2</th>
+        <th>Th 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>A1</td><td>A2</td><td>A2</td></tr>
+      <tr><td>B1</td><td>B2</td><td>A2</td></tr>
+      <tr><td>C1</td><td>C2</td><td>A2</td></tr>
+      <tr><td>D1</td><td>D2</td><td>A2</td></tr>
+      <tr><td>E1</td><td>E2</td><td>A2</td></tr>
+
+        <tr><td>A1</td><td>A2</td></tr>
+        <tr><td>B1</td><td>B2</td></tr>
+        <tr><td>C1</td><td>C2</td></tr>
+        <tr><td>D1</td><td>D2</td></tr>
+        <tr><td>E1</td><td>E2</td></tr>
+    </tbody>
+  </table>
+</div>
+  </div>
+
+  <!-- Services -->
+  <div class="w3-container" id="updates" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Update.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+      <form action="/action_page.php" target="_blank">
+        <div class="w3-section">
+          <label>Name</label>
+          <input class="w3-input w3-border" type="text" name="Name" required>
+        </div>
+        <div class="w3-section">
+          <label>Email</label>
+          <input class="w3-input w3-border" type="text" name="Email" required>
+        </div>
+        <div class="w3-section">
+          <label>Message</label>
+          <input class="w3-input w3-border" type="text" name="Message" required>
+        </div>
+        <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Send Message</button>
+      </form>
+    </div>
+
+  <!-- Designers -->
+  <div class="w3-container" id="team" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Team.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+  </div>
+
+  <!-- The Team -->
+  <div class="w3-row-padding w3-grayscale">
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team2.jpg" alt="John" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Jay Paranjape</h3>
+          <p class="w3-opacity">2017CS10XXX</p>
+          <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
+        </div>
+      </div>
+    </div>
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team1.jpg" alt="Jane" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Saksham Dhull</h3>
+          <p class="w3-opacity">2017CS10XXX</p>
+          <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
+        </div>
+      </div>
+    </div>
+    <div class="w3-col m4 w3-margin-bottom">
+      <div class="w3-light-grey">
+        <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
+        <div class="w3-container">
+          <h3>Siddhant Mago</h3>
+          <p class="w3-opacity">2017CS10XXX</p>
+          <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End page content -->
+</div>
+
+<!-- W3.CSS Container -->
+<div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
+
+<script>
+// Script to open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+// Modal Image Gallery
+function onClick(element) {
+  document.getElementById("img01").src = element.src;
+  document.getElementById("modal01").style.display = "block";
+  var captionText = document.getElementById("caption");
+  captionText.innerHTML = element.alt;
+}
+</script>
+
+</body>
+</html>
