@@ -62,22 +62,38 @@ th     { background:#eee; }
   <label for="queries">Choose a Query:</label>
   <select name="query" id="query">
     <option value="null"></option>
-    <option value="q1">Query 1</option>
-    <option value="q2">Query 2</option>
-    <option value="q3">Opel</option>
-    <option value="q4">Audi</option>
+    <option value="q1">Top k heroes most selected</option>
+    <option value="q3">Percentage of radiant wins</option>
+    <option value="q2">Percentage of Dire Wins</option>
+    <option value="q4">Overall Starter items</option>
   </select>
   <input type="submit" value="Submit">
 </form>
 <br>
+{% if data != None %}
 <div class="tableFixHead" id="results">
   <table>
+    {% if header != None %}
     <thead>
+      <tr>
+      {% for h in header %}
+      <th> {{h}} </th>
+      {% endfor %}
+    </tr>
     </thead>
+    {% endif %}
     <tbody>
+      {% for row in data %}
+      <tr>
+        {% for x in row %}
+        <td> {{x}} </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
+{% endif %}
   </div>
 
   <!-- Services -->
