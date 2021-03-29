@@ -1,0 +1,4 @@
+loader/archive*
+loader/archive/*
+loader/pgfutter_linux_amd64
+frontend/__pycache__/*

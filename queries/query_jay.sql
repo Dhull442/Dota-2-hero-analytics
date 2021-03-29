@@ -1,20 +1,20 @@
 --Materialized Views
 CREATE MATERIALIZED VIEW num_matches(num_matches)
 as(
-    select cast(count(1) as decimal) from matches
-)
+    select cast(count(1) as decimal) from match
+);
 
 CREATE MATERIALIZED VIEW player_hero_wins(match_id, hero_name, player_slot, won, gpm, xppm, damage, healing, tower_damage)
 as(
     select players.match_id, hero_names.localized_name as hero_name, player_slot, 
     ((radiant_win='True' AND player_slot<5) OR (radiant_win='False' AND player_slot>100)), 
-    gold_per_minute, xp_per_minute, hero_damage, hero_healing, tower_damage
+    gold_per_min, xp_per_min, hero_damage, hero_healing, tower_damage
     from players, match, hero_names
     where(
         match.match_id = players.match_id and
         players.hero_id = hero_names.hero_id
     )
-)
+);
 
 CREATE MATERIALIZED VIEW hero_builds(hero_name, item0, item1, item2, item3, item4, item5,
 build_count, win_rate, rn)
