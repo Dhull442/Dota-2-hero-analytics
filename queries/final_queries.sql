@@ -83,6 +83,64 @@
 -- )
 -- ;
 
+-- create materialized view win_rate(item_name, win_rate) as (
+--     select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
+--     (
+--         select item_id, avg(
+--             case when player_slot <= 3 and radiant_win = 'True' then 1
+--             when player_slot > 3 and radiant_win = 'False' then 1
+--             else 0
+--             end
+--         ) as win_rate from 
+--         purchase_log
+--         inner join match on match.match_id = purchase_log.match_id
+--         group by item_id
+--     ) temp
+--     inner join item_ids on  item_ids.item_id = temp.item_id
+--     order by win_rate desc
+-- );
+
+-- create materialized view early_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time < 0
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+    
+-- );
+
+-- create materialized view mid_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time < 1500 and
+--         time > 500
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+    
+-- );
+
+-- create materialized view end_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time > 2000
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+-- );
 
 --Hero Queries
 
@@ -266,34 +324,18 @@ limit 5
 
 
 --Item Queries
---TODO
 -- Early, mid, late stage items
-select item_ids.item_name, times_purchased from 
-(
-    select item_id, count(*) as times_purchased, 
-    rank() over (order by count(*) desc) 
-    from purchase_log
-    where time < 0 -- Can modify for different stages
-    group by item_id
-) as temp
-inner join item_ids on temp.item_id = item_ids.item_id
-order by rank
-;
+select * from early_game
+order by times_purchased desc;
+
+select * from mid_game
+order by times_purchased desc;
+
+select * from end_game
+order by times_purchased desc;
 
 -- Most win rate of items
-select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
-(
-    select item_id, avg(
-        case when player_slot <= 3 and radiant_win = 'True' then 1
-        when player_slot > 3 and radiant_win = 'False' then 1
-        else 0
-        end
-    ) as win_rate from 
-    purchase_log
-    inner join match on match.match_id = purchase_log.match_id
-    group by item_id
-) temp
-inner join item_ids on  item_ids.item_id = temp.item_id
+select * from win_rate
 order by win_rate desc
 ;
 
@@ -335,8 +377,16 @@ where stuns > 300
 order by stuns desc
 ;
 
---Blame Game
---TODO
+-- Good Game
+select match_id, positive_votes, region
+from match_cluster
+where positive_votes > 50
+order by positive_votes desc
+;
 
---GG
---TODO
+-- Blame Game
+select match_id, negative_votes, region
+from match_cluster
+where negative_votes > 10
+order by negative_votes desc
+;

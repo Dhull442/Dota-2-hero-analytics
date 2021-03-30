@@ -88,6 +88,84 @@ qdict = {
         'select localized_name as name from hero_names\
         order by localized_name\
         ;'
+    ),
+
+    "iq1":(
+        ["Item Name", "Times purchased"],\
+        'select item_name, times_purchased from early_game\
+        order by times_purchased desc;'
+    ),
+    "iq2":(
+        ["Item Name", "Times purchased"],\
+        'select item_name, times_purchased from mid_game\
+        order by times_purchased desc;'
+    ),
+    "iq3":(
+        ["Item Name", "Times purchased"],\
+        'select item_name, times_purchased from end_game\
+        order by times_purchased desc;'
+    ),
+    "iq4":(
+        ["Item Name", "Win rate"],\
+        'select item_name, win_rate from win_rate\
+        order by win_rate desc;'
+    ),
+
+    "aq1":(
+        ["Hero Name", "Gold Left"],\
+        'select localized_name, gold as gold_left\
+        from player_hero\
+        where gold > 15000\
+        order by gold desc\
+        ;'
+    ),
+    "aq2":(
+        ["Hero Name", "Denies"],\
+        'select localized_name, denies\
+        from player_hero\
+        where denies > 40\
+        order by denies desc\
+        ;'
+    ),
+    "aq3":(
+        ["Hero Name", "Hero XP"],\
+        'select localized_name, xp_hero\
+        from player_hero\
+        where xp_hero > 24000\
+        order by xp_hero desc\
+        ;'
+    ),
+    "aq4":(
+        ["Hero Name", "Creep XP"],\
+        'select localized_name, xp_creep\
+        from player_hero\
+        where xp_creep > 26000\
+        order by xp_creep desc\
+        ;'
+    ),
+    "aq5":(
+        ["Hero Name", "Stuns"],\
+        'select ocalized_name, stuns\
+        from player_hero\
+        where stuns > 300\
+        order by stuns desc\
+        ;'
+    ),
+    "aq6":(
+       ["Region", "Positive Votes"],\
+        'select region, positive_votes\
+        from match_cluster\
+        where positive_votes > 50\
+        order by positive_votes desc\
+        ;'
+    ),
+    "aq7":(
+        ["Region", "Negative Votes"],\
+        'select region, negative_votes\
+        from match_cluster\
+        where negative_votes > 10\
+        order by negative_votes desc\
+        ;'
     )
 }
 initqueries = """

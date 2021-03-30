@@ -21,18 +21,48 @@
 -- group by hero_names.localized_name
 -- ;
 
--- -- Early, mid, late stage items
--- select item_ids.item_name, times_purchased from 
--- (
---     select item_id, count(*) as times_purchased, 
---     rank() over (order by count(*) desc) 
---     from purchase_log
---     where time < 0 -- Can modify for different stages
---     group by item_id
--- ) as temp
--- inner join item_ids on temp.item_id = item_ids.item_id
--- order by rank
--- ;
+-- Early, mid, late stage items
+-- create materialized view early_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time < 0
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+    
+-- );
+
+-- create materialized view mid_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time < 1500 and
+--         time > 500
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+    
+-- );
+
+-- create materialized view end_game(item_name, times_purchased) as (
+--     select item_ids.item_name, times_purchased from 
+--     (
+--         select item_id, count(*) as times_purchased, 
+--         rank() over (order by count(*) desc) 
+--         from purchase_log
+--         where time > 2000
+--         group by item_id
+--     ) as temp
+--     inner join item_ids on temp.item_id = item_ids.item_id
+--     order by rank
+-- );
 
 
 
@@ -73,25 +103,42 @@
 -- order by count desc
 -- ;
 
-create materialized view match_cluster(match_id, region) as (
-    select match_id, region 
-    from match
-    inner join cluster_regions on match.cluster = cluster_regions.cluster
-)
-;
+-- create materialized view match_cluster(match_id, negative_votes, positive_votes, region) as (
+--     select match_id, negative_votes, positive_votes, region 
+--     from match
+--     inner join cluster_regions on match.cluster = cluster_regions.cluster
+-- )
+-- ;
 
--- Most deadly teamfights
-select temp.match_id, deaths, region from
-(
-    select match_id, max(deaths) as deaths
-    from teamfights
-    group by match_id
+-- create materialized view win_rate(item_name, win_rate) as (
+--     select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
+--     (
+--         select item_id, avg(
+--             case when player_slot <= 3 and radiant_win = 'True' then 1
+--             when player_slot > 3 and radiant_win = 'False' then 1
+--             else 0
+--             end
+--         ) as win_rate from 
+--         purchase_log
+--         inner join match on match.match_id = purchase_log.match_id
+--         group by item_id
+--     ) temp
+--     inner join item_ids on  item_ids.item_id = temp.item_id
+--     order by win_rate desc
+-- );
 
-) temp, match_cluster
-where temp.match_id = match_cluster.match_id
-order by deaths desc
-limit 5
-;
+-- -- Most deadly teamfights
+-- select temp.match_id, deaths, region from
+-- (
+--     select match_id, max(deaths) as deaths
+--     from teamfights
+--     group by match_id
+
+-- ) temp, match_cluster
+-- where temp.match_id = match_cluster.match_id
+-- order by deaths desc
+-- limit 5
+-- ;
 
 -- create materialized view player_hero(account_id, hero_id, localized_name, gold, denies, 
 -- xp_hero, xp_creep, stuns) as (
@@ -141,6 +188,21 @@ limit 5
 -- from player_hero
 -- where stuns > 300
 -- order by stuns desc
+-- ;
+
+-- ! Should we keep difference
+-- -- Good Game
+-- select match_id, positive_votes, region
+-- from match_cluster
+-- where positive_votes > 50
+-- order by positive_votes desc
+-- ;
+
+-- -- Blame Game
+-- select match_id, negative_votes, region
+-- from match_cluster
+-- where negative_votes > 10
+-- order by negative_votes desc
 -- ;
 
 -- drop materialized view player_hero;

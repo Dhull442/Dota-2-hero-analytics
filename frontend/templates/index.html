@@ -36,6 +36,7 @@ th     { background:#eee; }
     <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
     <a href="#hero_query" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Heros</a>
     <a href="#item_query" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Items</a>
+    <a href="#achievement_query" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Achievements</a>
     <a href="#updates" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Update/Add </a>
     <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Team</a>
 
@@ -152,18 +153,16 @@ th     { background:#eee; }
 <!-- # item -->
 <h1 class="w3-xxxlarge w3-text-red" id='item_query'><b>Items.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
-  and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
-   by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different heros.
+<p>Items are things heros can purchase in order to strengthen themselves.
 </p>
 <form action="/query" method="post">
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
-<option value="iq1">Top k heroes most selected</option>
-<option value="iq3">Percentage of radiant wins</option>
-<option value="iq4">Percentage of Dire Wins</option>
-<option value="iq5">Overall Starter items</option>
+<option value="iq1">Early game items</option>
+<option value="iq2">Mid game items</option>
+<option value="iq3">Late game items</option>
+<option value="iq4">Item win rate</option>
 </select>
 <input type="submit" value="Submit">
 </form>
@@ -192,7 +191,55 @@ th     { background:#eee; }
 </table>
 </div>
 {% endif %}
+
+<!-- # Achievements -->
+<h1 class="w3-xxxlarge w3-text-red" id="achievement_query"><b>Achievements.</b></h1>
+<hr style="width:50px;border:5px solid red" class="w3-round">
+<p>Achievements earned by different heroes
+</p>
+<form action="/query" method="post">
+<label for="queries">Choose a Query:</label>
+<select name="query" id="query">
+<option value="null"></option>
+<option value="aq1">Filthy Rich</option>
+<option value="aq2">Not on my watch</option>
+<option value="aq3">Hero farmer</option>
+<option value="aq4">Goblin slayer</option>
+<option value="aq5">Controller of crowds</option>
+<option value="aq6">Good game</option>
+<option value="aq7">Blame game</option>
+</select>
+<input type="submit" value="Submit">
+</form>
+<br>
+{% if data is defined and typequery=='a' %}
+<div class="tableFixHead" id="results3">
+<table>
+{% if header != None %}
+<thead>
+  <tr>
+  {% for h in header %}
+  <th> {{h}} </th>
+  {% endfor %}
+</tr>
+</thead>
+{% endif %}
+<tbody>
+  {% for row in data %}
+  <tr>
+    {% for x in row %}
+    <td> {{x}} </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+
   </div>
+
+
 
   <!-- Services -->
   <div class="w3-container" id="updates" style="margin-top:75px">
