@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import psycopg2 as pg
 
+
 # Queries Dictionary
 qdict = {
     "gq1":(["Hero Name"],"select min as hero_name from ( select min(localized_name), count(1) from players inner join hero_names using(hero_id) group by hero_id order by count desc limit 10 ) foo;"),
@@ -17,7 +18,66 @@ qdict = {
                                                 select count(1) from match\
                                                 where radiant_win = 'True'\
                                             ) numerator\
-                                            ;")
+                                            ;"),
+
+    "hq1":(["Hero Name","Number of Matches","Pick Rate","Win Rate", "KDA"],\
+            "select hero_name, count(1) as num_matches_played, round(100*(count(1)/min(num_matches)),2) as pick_rate, \
+            round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,\
+            round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA\
+            from player_hero_wins, num_matches\
+            group by hero_name\
+            order by pick_rate desc, win_rate desc, hero_name\
+        ;"),
+
+    "hq2":(["Hero Name","Win Rate","Pick Rate", "KDA"],\
+            "select hero_name, \
+            round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,\
+            round(100*(count(1)/min(num_matches)),2) as pick_rate,\
+            round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA\
+            from player_hero_wins, num_matches\
+            group by hero_name\
+            order by win_rate desc, pick_rate desc, hero_name\
+            ;"
+    ),
+
+    "hq3":(
+        ["Hero Name", "KDA", "Kills", "Deaths", "Assists"],\
+        "select hero_name, \
+        round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA,\
+        round(avg(K),2) as K,\
+        round(avg(D),2) as D,\
+        round(avg(A),2) as A\
+        from player_hero_wins, num_matches\
+        group by hero_name\
+        order by KDA desc, hero_name\
+        ;"
+    ),
+
+    "hq4":(
+        ["Hero Name","Gold Per Minute","Experience Per Minute"],\
+        'select hero_name, round(avg(gpm),2) as "Gold / Minute", round(avg(xppm),2) as "Experience / Minute"\
+        from player_hero_wins\
+        group by hero_name\
+        order by "Gold / Minute" desc, "Experience / Minute" desc,hero_name\
+        ;'
+    ),
+
+    "hq5":(
+        ["Hero Name","Average Damage","Average Tower Damage","Average Healing"],\
+        'select hero_name, round(avg(damage),2) as "Average Damage", round(avg(tower_damage),2) as "Average Tower Damage",\
+        round(avg(healing),2) as "Average Healing"\
+        from player_hero_wins\
+        group by hero_name\
+        order by "Average Damage" desc, "Average Tower Damage" desc, "Average Healing" desc, hero_name\
+        ;'
+    ),
+
+    "hq6":(
+        ["Hero Name"],\
+        'select localized_name as name from hero_names\
+        order by localized_name\
+        ;'
+    )
 }
 initqueries = """
 CREATE MATERIALIZED VIEW num_matches(num_matches)
@@ -67,12 +127,12 @@ as(
 """
 def views_init():
     print("Initialize Views")
-    conn = pg.connect(host='/var/run/postgresql',dbname='project_db', user='dhull', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='1234')
     try:
         cursor = conn.cursor()
         cursor.execute(initqueries)
         conn.commit()
-    except (Exception, psycopg2.Error) as error:
+    except (Exception, pg.Error) as error:
         print("Error while creating views from PostgreSQL", error)
     finally:
         if conn is not None:
@@ -85,13 +145,13 @@ def query_main(query_num):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='/var/run/postgresql',dbname='project_db', user='dhull', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='1234')
     data = None
     try:
         cursor = conn.cursor()
         cursor.execute(query)
         data = cursor.fetchall()
-    except (Exception, psycopg2.Error) as error:
+    except (Exception, pg.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
     finally:
         if conn is not None:
