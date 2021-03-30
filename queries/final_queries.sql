@@ -76,6 +76,13 @@
 --     inner join hero_names on hero_names.hero_id = players.hero_id
 -- );
 
+-- create materialized view match_cluster(match_id, region) as (
+--     select match_id, region 
+--     from match
+--     inner join cluster_regions on match.cluster = cluster_regions.cluster
+-- )
+-- ;
+
 
 --Hero Queries
 
@@ -245,14 +252,16 @@ num_matches,
 ;
 
 -- Most deadly teamfights
-select match_id, deaths from
+select deaths, region from
 (
-    select match_id, deaths,
-    rank() over (partition by match_id order by deaths desc, start)
+    select match_id, max(deaths) as deaths
     from teamfights
+    group by match_id
 
-) temp
-where rank = 1
+) temp, match_cluster
+where temp.match_id = match_cluster.match_id
+order by deaths desc
+limit 5
 ;
 
 

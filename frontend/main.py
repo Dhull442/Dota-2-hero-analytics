@@ -5,6 +5,17 @@ import psycopg2 as pg
 # Queries Dictionary
 qdict = {
     "gq1":(["Hero Name"],"select min as hero_name from ( select min(localized_name), count(1) from players inner join hero_names using(hero_id) group by hero_id order by count desc limit 10 ) foo;"),
+    "gq2":(["Region", "Deaths"], "select region, deaths from\
+                                    (\
+                                        select match_id, max(deaths) as deaths\
+                                        from teamfights\
+                                        group by match_id\
+\
+                                    ) temp, match_cluster\
+                                    where temp.match_id = match_cluster.match_id\
+                                    order by deaths desc\
+                                    limit 5\
+                                    ;"),
     "gq3":(["Percentage of Radiant Wins"],   "select round(100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from\
                                             num_matches,\
                                             (\
@@ -127,7 +138,7 @@ as(
 """
 def views_init():
     print("Initialize Views")
-    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
     try:
         cursor = conn.cursor()
         cursor.execute(initqueries)
@@ -145,7 +156,7 @@ def query_main(query_num):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
     data = None
     try:
         cursor = conn.cursor()
