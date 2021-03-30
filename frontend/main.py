@@ -3,15 +3,15 @@ import psycopg2 as pg
 
 # Queries Dictionary
 qdict = {
-    "q1":(["Hero Name"],"select min as hero_name from ( select min(localized_name), count(1) from players inner join hero_names using(hero_id) group by hero_id order by count desc limit 10 ) foo;"),
-    "q3":(["Percentage of Radiant Wins"],   "select round(100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from\
+    "gq1":(["Hero Name"],"select min as hero_name from ( select min(localized_name), count(1) from players inner join hero_names using(hero_id) group by hero_id order by count desc limit 10 ) foo;"),
+    "gq3":(["Percentage of Radiant Wins"],   "select round(100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from\
                                             num_matches,\
                                             (\
                                                 select count(1) from match\
                                                 where radiant_win = 'True'\
                                             ) numerator\
                                             ;"),
-    "q4":(["Percentage of Dire Wins"],   "select round(100 - 100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from\
+    "gq4":(["Percentage of Dire Wins"],   "select round(100 - 100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from\
                                             num_matches,\
                                             (\
                                                 select count(1) from match\
@@ -110,7 +110,7 @@ def home():
 def askquery():
     query = request.form['query']
     header,data = query_main(query)
-    return render_template('index.html',header=header,data = data)
+    return render_template('index.html',header=header,data = data,typequery=query[0])
 
 @app.route('/update')
 def update():

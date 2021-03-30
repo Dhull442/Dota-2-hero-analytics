@@ -67,16 +67,17 @@ th     { background:#eee; }
   <label for="queries">Choose a Query:</label>
   <select name="query" id="query">
     <option value="null"></option>
-    <option value="q1">Top k heroes most selected</option>
-    <option value="q3">Percentage of radiant wins</option>
-    <option value="q4">Percentage of Dire Wins</option>
-    <option value="q5">Overall Starter items</option>
+    <option value="gq1">Top k heroes most selected</option>
+    <option value="gq3">Percentage of radiant wins</option>
+    <option value="gq4">Percentage of Dire Wins</option>
+    <option value="gq5">Overall Starter items</option>
   </select>
   <input type="submit" value="Submit">
 </form>
+
+{% if data is defined and typequery=='g' %}
+<button type="button" onclick="download_table_as_csv('results');">Download as CSV</button>
 <br>
-{% if data != None %}
-<a href="#" onclick="download_table_as_csv('results');">Download as CSV</a>
 <div class="tableFixHead" id="results">
   <table>
     {% if header != None %}
@@ -112,15 +113,15 @@ th     { background:#eee; }
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
-<option value="q1">Top k heroes most selected</option>
-<option value="q3">Percentage of radiant wins</option>
-<option value="q4">Percentage of Dire Wins</option>
-<option value="q5">Overall Starter items</option>
+<option value="hq1">Top k heroes most selected</option>
+<option value="hq3">Percentage of radiant wins</option>
+<option value="hq4">Percentage of Dire Wins</option>
+<option value="hq5">Overall Starter items</option>
 </select>
 <input type="submit" value="Submit">
 </form>
 <br>
-{% if data != None %}
+{% if data is defined and typequery=='h' %}
 <div class="tableFixHead" id="results1">
 <table>
 {% if header != None %}
@@ -157,15 +158,15 @@ th     { background:#eee; }
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
-<option value="q1">Top k heroes most selected</option>
-<option value="q3">Percentage of radiant wins</option>
-<option value="q4">Percentage of Dire Wins</option>
-<option value="q5">Overall Starter items</option>
+<option value="iq1">Top k heroes most selected</option>
+<option value="iq3">Percentage of radiant wins</option>
+<option value="iq4">Percentage of Dire Wins</option>
+<option value="iq5">Overall Starter items</option>
 </select>
 <input type="submit" value="Submit">
 </form>
 <br>
-{% if data != None %}
+{% if data is defined and typequery=='i' %}
 <div class="tableFixHead" id="results2">
 <table>
 {% if header != None %}
