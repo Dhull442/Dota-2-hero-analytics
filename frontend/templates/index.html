@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<!-- <head> -->
 <title>Dota-2 Hero Analytics</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="favicon.ico" rel="icon" type="image/x-icon" />
+<link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- <script type="text/javascript" src="jquery.js"></script> -->
 
@@ -20,13 +21,13 @@ body {font-size:16px;}
 
 /* Just common table stuff. Really. */
 table  { border-collapse: collapse; width: 100%; }
-th, td { padding: 8px 16px; }
+th, td { padding: 8px 16px;text-align:center;border: 1px solid #ddd; }
 th     { background:#eee; }
 h_div {
     display: none;
 }
 </style>
-</head>
+<!-- </head> -->
 <body>
 
 <!-- Sidebar/menu -->
@@ -67,7 +68,17 @@ h_div {
       and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
        by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different heros.
 </p>
-<form action="/query" method="post">
+<form action='/query' method="post" style="display: none;" id="hidden_form">
+  <input id="queryvalue" name="query" value=""/>
+</form>
+<div class="w3-bar w3-black">
+  <button class="w3-bar-item w3-button" onclick="fillform('gq1')" id="gq1">Top k heroes most selected</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('gq2')" id="gq2">Most deadly teamfights</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('gq3')" id="gq3">Percentage of Radiant Wins</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('gq4')" id="gq4">Percentage of Dire Wins</button>
+</div>
+
+<!-- <form action="/query" method="post">
   <label for="queries">Choose a Query:</label>
   <select name="query" id="query">
     <option value="null"></option>
@@ -77,18 +88,17 @@ h_div {
     <option value="gq4">Percentage of Dire Wins</option>
   </select>
   <input type="submit" value="Submit">
-</form>
+</form> -->
 <br>
 {% if data is not none and typequery=='g' %}
-<p id="query_val"></p>
-<button type="button" onclick="download_table_as_csv('results');">Download as CSV</button>
+<button type="button" class="w3-button w3-white w3-border w3-border-red w3-round" onclick="download_table_as_csv('results');"><i class="material-icons w3-small">file_download</i> Download as CSV</button>
 <div class="tableFixHead" id="results">
   <table>
     {% if header != None %}
     <thead>
       <tr>
       {% for h in header %}
-      <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
+      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}" ><i class="material-icons w3-small">swap_vert</i></a> </th>
       {% endfor %}
     </tr>
     </thead>
@@ -205,9 +215,14 @@ h_div {
 <!-- # item -->
 <h1 class="w3-xxxlarge w3-text-red" id='iquery'><b>Items.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Items are things heros can purchase in order to strengthen themselves.
-</p>
-<form action="/query" method="post">
+<p>Items are things heros can purchase in order to strengthen themselves.</p>
+<div class="w3-bar w3-black">
+  <button class="w3-bar-item w3-button" onclick="fillform('iq1')" id="iq1">Early game items</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('iq2')" id="iq2">Mid game items</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('iq3')" id="iq3">Late game items</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('iq4')" id="iq4">Item win rate</button>
+</div>
+<!-- <form action="/query" method="post">
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
@@ -217,12 +232,11 @@ h_div {
 <option value="iq4">Item win rate</option>
 </select>
 <input type="submit" value="Submit">
-</form>
+</form> -->
 <br>
 {% if data is not none and typequery=='i' %}
-<p id="query_val"></p>
-
-<button type="button" onclick="download_table_as_csv('results2');">Download as CSV</button>
+<!-- <button type="button" class="w3-button w3-white w3-border w3-border-red w3-round-large" onclick="download_table_as_csv('results2');">Download as CSV</button> -->
+<button type="button" class="w3-button w3-white w3-border w3-border-red w3-round" onclick="download_table_as_csv('results2');"><i class="material-icons w3-small">file_download</i> Download as CSV</button>
 
 <div class="tableFixHead" id="results2">
 <table>
@@ -253,7 +267,16 @@ h_div {
 <hr style="width:50px;border:5px solid red" class="w3-round">
 <p>Achievements earned by different heroes
 </p>
-<form action="/query" method="post">
+<div class="w3-bar w3-black">
+  <button class="w3-bar-item w3-button" onclick="fillform('aq1')" id="aq1">Filthy Rich</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq2')" id="aq2">Not on my watch</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq3')" id="aq3">Hero farmer</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq4')" id="aq4">Goblin slayer</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq5')" id="aq5">Controller of crowds</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq6')" id="aq6">Good game</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('aq7')" id="aq7">Blame game</button>
+</div>
+<!-- <form action="/query" method="post">
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
@@ -266,12 +289,10 @@ h_div {
 <option value="aq7">Blame game</option>
 </select>
 <input type="submit" value="Submit">
-</form>
+</form> -->
 <br>
 {% if data is not none and typequery=='a' %}
-
-<p id="query_val"></p>
-<button type="button" onclick="download_table_as_csv('results3');">Download as CSV</button>
+<button type="button" class="w3-button w3-white w3-border w3-border-red w3-round" onclick="download_table_as_csv('results3');"><i class="material-icons w3-small">file_download</i> Download as CSV</button>
 <div class="tableFixHead" id="results3">
 <table>
 {% if header != None %}
@@ -305,7 +326,7 @@ h_div {
     <h1 class="w3-xxxlarge w3-text-red"><b>Update.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
       <!-- <label for="update_domain">Choose a Query:</label> -->
-      <form>
+      <!-- <form>
       <label for="cases">Choose a table:</label>
       <select name="cases" id="cases">
         <option value=""></option>
@@ -313,9 +334,14 @@ h_div {
         <option value="item">Item</option>
         <option value="player">Player</option>
       </select>
-    </form>
+    </form> -->
+    <div class="w3-bar w3-black">
+      <button class="w3-bar-item w3-button" onclick="showform('hero_update')">Hero Update</button>
+      <button class="w3-bar-item w3-button" onclick="showform('item_update')">Item Update</button>
+      <button class="w3-bar-item w3-button" onclick="showform('player_update')">Player Update</button>
+    </div>
       <!-- <form action="/update_val" id="update_form"> -->
-        <div class="h_div" id="hero_update">
+        <div  id="hero_update" style="display:none;">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Hero Name</label>
@@ -325,11 +351,11 @@ h_div {
             <label>Hero game name</label>
             <input class="w3-input w3-border" type="text" name="Email" required>
           </div>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
         </form>
         </div>
 
-        <div class="h_div" id="item_update">
+        <div  id="item_update" style="display:none;">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Item Name</label>
@@ -339,10 +365,10 @@ h_div {
             <label>Item id</label>
             <input class="w3-input w3-border" type="text" name="Email" required>
           </div>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
         </div>
-        <div class="h_div" id="player_update">
+        <div  id="player_update" style="display:none;">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Name</label>
@@ -356,7 +382,7 @@ h_div {
             <label>Message</label>
             <input class="w3-input w3-border" type="text" name="Message" required>
           </div>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
         </div>
     </div>
@@ -406,26 +432,39 @@ h_div {
 
 <!-- W3.CSS Container -->
 <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
-
+{% if prevq is not none %}
 <script>
-$('#cases').change(function () {
-	  var value = this.value;
-    console.log(this.value);
-        if(this.value==""){
-      $('#hero_update').display.style = "none";
-      $('#item_update').display.style = "none";
-      $('#player_update').display.style = "none";
-      return;
-    }
-    $('#hero_update').display.style = "none";
-    $('#item_update').display.style = "none";
-    $('#player_update').display.style = "none";
-    $('#' + this.value+'_update').display.style = "block";
-});
-function getqueryname(table_id){
-  var e = document.getElementById("#"+table_id);
-  var strUser = e.options[{{qq}}].text;
-  document.getElementById('query_val').innerHTML = strUser;
+document.getElementById('{{prevq}}').className += 'w3-red';
+document.getElementById('{{typequery}}'+'query').scrollIntoView();
+</script>
+{% endif %}
+<script>
+function fillform(query){
+  document.getElementById('queryvalue').value=query
+  document.getElementById('hidden_form').submit()
+}
+</script>
+<script>
+// $('#cases').change(function () {
+// 	  var value = this.value;
+//     console.log(this.value);
+//         if(this.value==""){
+//       $('#hero_update').display.style = "none";
+//       $('#item_update').display.style = "none";
+//       $('#player_update').display.style = "none";
+//       return;
+//     }
+//     $('#hero_update').display.style = "none";
+//     $('#item_update').display.style = "none";
+//     $('#player_update').display.style = "none";
+//     $('#' + this.value+'_update').display.style = "block";
+// });
+function showform(id) {
+  // reset
+  document.getElementById('hero_update').style.display='none';
+  document.getElementById('item_update').style.display='none';
+  document.getElementById('player_update').style.display='none';
+  document.getElementById(id).style.display="block";
 }
 </script>
 <script>
