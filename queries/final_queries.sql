@@ -340,97 +340,101 @@ FOR EACH STATEMENT EXECUTE PROCEDURE refresh_gametime_items();
 --     order by localized_name
 --     ;
 
---     --Hero Particular Queries
---     --Hero Vs Hero Win rate
---     with hero1(p1_id) as
---     (
---         select hero_id from hero_names
---         where localized_name='Axe'  --put hero 1 name here
---         limit 1 
---     ),
---     hero2(p2_id) as
---     (
---         select hero_id from hero_names
---         where localized_name='Bane'  --put hero 2 name here
---         limit 1 
---     ),
---     foo1(match_id, hero_id, player_slot, radiant_win) as
---     (
---         select match.match_id, hero_id, players.player_slot, radiant_win
---         from players, match, hero1
---         where (hero_id = hero1.p1_id and match.match_id = players.match_id)
---     ),
---     foo2(match_id, hero_id, player_slot, radiant_win) as
---     (
---         select match.match_id, hero_id, players.player_slot, radiant_win
---         from players, match, hero2
---         where (hero_id = hero2.p2_id and match.match_id = players.match_id)
---     )
+    -- --Hero Particular Queries
+    -- --Hero Vs Hero Win rate
+    -- with hero1(p1_id) as
+    -- (
+    --     select hero_id from hero_names
+    --     where localized_name='Axe'  --put hero 1 name here
+    --     limit 1 
+    -- ),
+    -- hero2(p2_id) as
+    -- (
+    --     select hero_id from hero_names
+    -- ),
+    -- foo1(match_id, hero_id, player_slot, radiant_win) as
+    -- (
+    --     select match.match_id, hero_id, players.player_slot, radiant_win
+    --     from players, match, hero1
+    --     where (hero_id = hero1.p1_id and match.match_id = players.match_id)
+    -- ),
+    -- foo2(match_id, hero_id, player_slot, radiant_win) as
+    -- (
+    --     select match.match_id, hero_id, players.player_slot, radiant_win
+    --     from players, match, hero2
+    --     where (hero_id = hero2.p2_id and match.match_id = players.match_id)
+    -- )
+    
+    -- select localized_name as hero_name, round(100*(h1.p1_wins/cast(h2.total_p1p2 as decimal)),2) as p1p2_winrate from
+    -- (
+    --     select foo2.hero_id, count(distinct foo1.match_id) as p1_wins from
+    --     foo1,foo2
+    --     where
+    --     (
+    --         foo1.match_id = foo2.match_id and
+    --         (
+    --             (foo1.player_slot < 5 and foo2.player_slot>100 and foo1.radiant_win='True')
+    --             or
+    --             (foo1.player_slot > 100 and foo2.player_slot<5 and foo1.radiant_win='False')
+    --         )
+    --     )
+    --     group by foo2.hero_id 
+    -- ) h1,
+    -- (
+    --     select foo2.hero_id, count(distinct foo1.match_id) as total_p1p2 from
+    --     foo1,foo2
+    --     where
+    --     (
+    --         foo1.match_id = foo2.match_id and
+    --         (
+    --             (foo1.player_slot < 5 and foo2.player_slot>100)
+    --             or
+    --             (foo1.player_slot > 100 and foo2.player_slot<5)
+    --         )
+    --     )
+    --     group by foo2.hero_id 
+    -- ) h2, hero_names
+    -- where h1.hero_id = h2.hero_id and
+    -- h2.hero_id = hero_names.hero_id
+    -- ;
 
---     select round(100*(h1.p1_wins/cast(h2.total_p1p2 as decimal)),2) as p1p2_winrate from
---     (
---         select count(distinct foo1.match_id) as p1_wins from
---         foo1,foo2
---         where
---         (
---             foo1.match_id = foo2.match_id and
---             (
---                 (foo1.player_slot < 5 and foo2.player_slot>100 and foo1.radiant_win='True')
---                 or
---                 (foo1.player_slot > 100 and foo2.player_slot<5 and foo1.radiant_win='False')
---             )
---         ) 
---     ) h1,
---     (
---         select count(distinct foo1.match_id) as total_p1p2 from
---         foo1,foo2
---         where
---         (
---             foo1.match_id = foo2.match_id and
---             (
---                 (foo1.player_slot < 5 and foo2.player_slot>100)
---                 or
---                 (foo1.player_slot > 100 and foo2.player_slot<5)
---             )
---         ) 
---     ) h2
---     ;
+-- --Top k Build Order--
+-- select array[item0, item1, item2, item3, item4, item5] as items,
+-- build_count, round(100*win_rate/cast(build_count as decimal),2) as win_rate
+-- from hero_builds
+-- where rn=1 and hero_name='Axe' --select k and name here
+-- ;
 
---     --Top k Build Order--
---     select item0, item1, item2, item3, item4, item5,
---     build_count, round(100*win_rate/cast(build_count as decimal),2) as win_rate
---     from hero_builds
---     where rn<=3 and hero_name='Axe' --select k and name here
---     ;
-
---     --Top k Ability Order
---     --TODO
---     -- Ability upgrade order
---     with hero1(p1_id) as
---     (
---         select hero_id from hero_names
---         where localized_name='Axe'  --put hero 1 name here
---         limit 1 
---     ),
---     hero_ability(match_id, slot, ability_name, time, hero_id) as (
---         select players.match_id, players.player_slot, ability_name, time, players.hero_id
---         from players
---         inner join hero1 on hero1.p1_id=players.hero_id
---         inner join ability_upgrades on 
---         players.match_id = ability_upgrades.match_id and
---         players.player_slot = ability_upgrades.player_slot
---         inner join ability_ids on 
---         ability_ids.ability_id = ability_upgrades.ability
---     )
---     select *, count(*) as count from (
---         select hero_id, array_agg(ability_name order by time) as ability_order from
---         hero_ability
---         group by hero_id, slot, match_id
---     ) temp
---     group by hero_id, ability_order
---     order by count desc
---     limit 3 --Choose k here
---     ;
+--Top k Ability Order
+--TODO
+-- Ability upgrade order
+with hero1(p1_id) as
+(
+    select hero_id from hero_names
+    where localized_name='Axe'  --put hero 1 name here
+    limit 1 
+),
+hero_ability(match_id, slot, ability_name, time, hero_id) as (
+    select players.match_id, players.player_slot, ability_name, time, players.hero_id
+    from players
+    inner join hero1 on hero1.p1_id=players.hero_id
+    inner join ability_upgrades on 
+    players.match_id = ability_upgrades.match_id and
+    players.player_slot = ability_upgrades.player_slot
+    inner join ability_ids on 
+    ability_ids.ability_id = ability_upgrades.ability
+)
+select a.nr as order, a.ability from (
+    select ability_order, count(*) as count from (
+        select hero_id, array_agg(ability_name order by time) as ability_order from
+        hero_ability
+        group by hero_id, slot, match_id
+    ) temp
+    group by hero_id, ability_order
+    order by count desc
+    limit 1
+) temp2, unnest(temp2.ability_order) with ordinality a(ability, nr)
+;
 
 
 --     --General Queries
@@ -539,18 +543,18 @@ FOR EACH STATEMENT EXECUTE PROCEDURE refresh_gametime_items();
 
 
 --UPDATE Queries
-    --Hero Name--
-    UPDATE hero_names
-    SET localized_name = 'New Name',  --New name here
-        name = 'npc_dota_hero_new_name'
-    WHERE localized_name = 'Axe' --old name here
-    ;
+    -- --Hero Name--
+    -- UPDATE hero_names
+    -- SET localized_name = 'New Name',  --New name here
+    --     name = 'npc_dota_hero_new_name'
+    -- WHERE localized_name = 'Axe' --old name here
+    -- ;
 
-    --Item Name--
-    UPDATE item_ids
-    SET item_name = 'New_ItemName'  --New name here
-    WHERE item_name = 'blink' --old name here
-    ;
+    -- --Item Name--
+    -- UPDATE item_ids
+    -- SET item_name = 'New_ItemName'  --New name here
+    -- WHERE item_name = 'blink' --old name here
+    -- ;
 
     -- --Return to Normal
     -- UPDATE hero_names

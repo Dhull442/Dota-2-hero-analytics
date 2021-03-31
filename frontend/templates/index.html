@@ -71,7 +71,7 @@ h_div {
   <label for="queries">Choose a Query:</label>
   <select name="query" id="query">
     <option value="null"></option>
-    <option value="gq1">Top k heroes most selected</option>
+    <option value="gq1">Top heroes most selected</option>
     <option value="gq2">Most deadly teamfights</option>
     <option value="gq3">Percentage of Radiant Wins</option>
     <option value="gq4">Percentage of Dire Wins</option>
@@ -161,22 +161,31 @@ h_div {
     Select a hero to get it's detailed stats.
 </p>
 <form action="/hero" method="post">
+<label for="queries">Choose a Query:</label>
+<select name="query" id="query">
+<option value="null"></option>
+<option value="hsq1">Most common item build</option>
+<option value="hsq2">Hero against stats</option>
+<option value="hsq3">Most Common ability upgrade</option>
+</select>
+<br>
 <label for="queries">Choose a Hero:</label>
-{% if all_heroes is defined %}
+{% if all_heros is defined %}
 <select name="hero_name" id="hero_name">
 <option value="null"></option>
-    {% for hero in all_heroes %}
-    <option value={{hero[0]}}>{{hero[0]}}</option>
+    {% for hero in all_heros %}
+    <option value="{{hero[0]}}">{{hero[0]}}</option>
     {% endfor %}
 </select>
 {% else %}
     <select name="query" id="query">
     <option value="null"> No Heros available </option>
 {% endif %}
+<br>
 <input type="submit" value="Submit">
 </form>
 <br>
-<!-- {% if data is defined and typequery=='h' %}
+{% if data is defined and data != None and typequery=='hs' %}
 <div class="tableFixHead" id="results1">
 <table>
 {% if header != None %}
@@ -199,7 +208,7 @@ h_div {
 </tbody>
 </table>
 </div>
-{% endif %} -->
+{% endif %}
 
 
 <!-- # item -->
