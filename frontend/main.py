@@ -292,7 +292,9 @@ def query_main(query_num, sortby=None, hero_name=None):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    # conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
+
     data = None
     try:
         cursor = conn.cursor()
