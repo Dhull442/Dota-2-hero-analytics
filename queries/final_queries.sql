@@ -1,18 +1,18 @@
---Index
-create index player_indx on players(hero_id);
-create index hero_names_indx on hero_names(hero_id);
-create index purchase_indx on purchase_log(match_id)
-;
-create index match_indx on match(match_id)
-;
-create index player_indx_2 on players(match_id, player_slot)
-;
+-- --Index
+-- create index player_indx on players(hero_id);
+-- create index hero_names_indx on hero_names(hero_id);
+-- create index purchase_indx on purchase_log(match_id)
+-- ;
+-- create index match_indx on match(match_id)
+-- ;
+-- create index player_indx_2 on players(match_id, player_slot)
+-- ;
 
-create index ability_upgarde_indx_2 on ability_upgrades(match_id, player_slot)
-;
+-- create index ability_upgarde_indx_2 on ability_upgrades(match_id, player_slot)
+-- ;
 
-create index ability_indx_2 on ability_ids(ability_id)
-;
+-- create index ability_indx_2 on ability_ids(ability_id)
+-- ;
 
 drop materialized view num_matches;
 drop materialized view player_hero_wins;
@@ -25,8 +25,10 @@ drop materialized view mid_game;
 drop materialized view end_game;
 
 
+
 --Materialized Views in the Database
 CREATE MATERIALIZED VIEW num_matches(num_matches)
+
 as(
     select cast(count(1) as decimal) from match
 );
@@ -34,7 +36,7 @@ as(
 CREATE OR REPLACE FUNCTION refresh_num_matches()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY num_matches;
+    REFRESH MATERIALIZED VIEW  num_matches;
     RETURN NULL;
 END;
 $$;
@@ -55,13 +57,14 @@ as(
 CREATE OR REPLACE FUNCTION refresh_player_hero_wins()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY player_hero_wins;
+    REFRESH MATERIALIZED VIEW  player_hero_wins;
     RETURN NULL;
 END;
 $$;
 
 CREATE MATERIALIZED VIEW hero_builds(hero_name, item0, item1, item2, item3, item4, item5,
 build_count, win_rate, rn)
+
 as(
     select localized_name, item0.item_name, item1.item_name, item2.item_name, 
     item3.item_name, item4.item_name, item5.item_name, count, wr,
@@ -91,7 +94,7 @@ as(
 CREATE OR REPLACE FUNCTION refresh_hero_builds()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY hero_builds;
+    refresh MATERIALIZED VIEW  hero_builds;
     RETURN NULL;
 END;
 $$;
@@ -113,26 +116,31 @@ xp_hero, xp_creep, stuns) as (
 CREATE OR REPLACE FUNCTION refresh_player_hero()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY player_hero;
+    refresh MATERIALIZED VIEW  player_hero;
     RETURN NULL;
 END;
 $$;
 
-create materialized view match_cluster(match_id, positive_votes, negative_votes,region) as (
+create materialized view match_cluster(match_id, positive_votes, negative_votes,region)
+
+as (
     select match_id, positive_votes,negative_votes, region 
     from match
     inner join cluster_regions on match.cluster = cluster_regions.cluster
 )
+
 ;
 CREATE OR REPLACE FUNCTION refresh_match_cluster()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY match_cluster;
+    refresh MATERIALIZED VIEW  match_cluster;
     RETURN NULL;
 END;
 $$;
 
-create materialized view win_rate(item_name, win_rate) as (
+create materialized view win_rate(item_name, win_rate) 
+
+as (
     select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
     (
         select item_id, avg(
@@ -151,12 +159,13 @@ create materialized view win_rate(item_name, win_rate) as (
 CREATE OR REPLACE FUNCTION refresh_win_rate()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY win_rate;
+    refresh MATERIALIZED VIEW  win_rate;
     RETURN NULL;
 END;
 $$;
 
-create materialized view early_game(item_name, times_purchased) as (
+create materialized view early_game(item_name, times_purchased)
+ as (
     select item_ids.item_name, times_purchased from 
     (
         select item_id, count(*) as times_purchased, 
@@ -170,7 +179,8 @@ create materialized view early_game(item_name, times_purchased) as (
     
 );
 
-create materialized view mid_game(item_name, times_purchased) as (
+create materialized view mid_game(item_name, times_purchased)
+ as (
     select item_ids.item_name, times_purchased from 
     (
         select item_id, count(*) as times_purchased, 
@@ -185,7 +195,8 @@ create materialized view mid_game(item_name, times_purchased) as (
     
 );
 
-create materialized view end_game(item_name, times_purchased) as (
+create materialized view end_game(item_name, times_purchased)
+ as (
     select item_ids.item_name, times_purchased from 
     (
         select item_id, count(*) as times_purchased, 
@@ -201,9 +212,9 @@ create materialized view end_game(item_name, times_purchased) as (
 CREATE OR REPLACE FUNCTION refresh_gametime_items()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY early_game;
-    REFRESH MATERIALIZED VIEW CONCURRENTLY mid_game;
-    REFRESH MATERIALIZED VIEW CONCURRENTLY end_game;
+    refresh MATERIALIZED VIEW  early_game;
+    refresh MATERIALIZED VIEW  mid_game;
+    refresh MATERIALIZED VIEW  end_game;
     RETURN NULL;
 END;
 $$;
@@ -277,251 +288,279 @@ CREATE TRIGGER refresh_gametime_items AFTER INSERT OR UPDATE OR DELETE
 ON purchase_log
 FOR EACH STATEMENT EXECUTE PROCEDURE refresh_gametime_items();
 
---Hero Queries
+-- --Hero Queries
 
---Most Played--
-select hero_name, count(1) as num_matches_played, round(100*(count(1)/min(num_matches)),2) as pick_rate, 
-round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,
-round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA
-from player_hero_wins, num_matches
-group by hero_name
-order by pick_rate desc, win_rate desc, hero_name
-;
+--     --Most Played--
+--     select hero_name, count(1) as num_matches_played, round(100*(count(1)/min(num_matches)),2) as pick_rate, 
+--     round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,
+--     round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA
+--     from player_hero_wins, num_matches
+--     group by hero_name
+--     order by pick_rate desc, win_rate desc, hero_name
+--     ;
 
---Win Rate--
-select hero_name, 
-round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,
-round(100*(count(1)/min(num_matches)),2) as pick_rate,
-round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA
-from player_hero_wins, num_matches
-group by hero_name
-order by win_rate desc, pick_rate desc, hero_name
-;
+--     --Win Rate--
+--     select hero_name, 
+--     round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,
+--     round(100*(count(1)/min(num_matches)),2) as pick_rate,
+--     round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA
+--     from player_hero_wins, num_matches
+--     group by hero_name
+--     order by win_rate desc, pick_rate desc, hero_name
+--     ;
 
---GameImpact--
-select hero_name, 
-round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA,
-round(avg(K),2) as K,
-round(avg(D),2) as D,
-round(avg(A),2) as A
-from player_hero_wins, num_matches
-group by hero_name
-order by KDA desc, hero_name
-;
+--     --GameImpact--
+--     select hero_name, 
+--     round((avg(K)+avg(A))/cast(avg(D) as decimal),2) as KDA,
+--     round(avg(K),2) as K,
+--     round(avg(D),2) as D,
+--     round(avg(A),2) as A
+--     from player_hero_wins, num_matches
+--     group by hero_name
+--     order by KDA desc, hero_name
+--     ;
 
---Economy--
-select hero_name, round(avg(gpm),2) as "Gold / Minute", round(avg(xppm),2) as "Experience / Minute"
-from player_hero_wins
-group by hero_name
-order by "Gold / Minute" desc, "Experience / Minute" desc,hero_name
-;
+--     --Economy--
+--     select hero_name, round(avg(gpm),2) as "Gold / Minute", round(avg(xppm),2) as "Experience / Minute"
+--     from player_hero_wins
+--     group by hero_name
+--     order by "Gold / Minute" desc, "Experience / Minute" desc,hero_name
+--     ;
 
---Damage And Healing--
-select hero_name, round(avg(damage),2) as "Average Damage", round(avg(tower_damage),2) as "Average Tower Damage",
-round(avg(healing),2) as "Average Healing"
-from player_hero_wins
-group by hero_name
-order by "Average Damage" desc, "Average Tower Damage" desc, "Average Healing" desc, hero_name
-;
+--     --Damage And Healing--
+--     select hero_name, round(avg(damage),2) as "Average Damage", round(avg(tower_damage),2) as "Average Tower Damage",
+--     round(avg(healing),2) as "Average Healing"
+--     from player_hero_wins
+--     group by hero_name
+--     order by "Average Damage" desc, "Average Tower Damage" desc, "Average Healing" desc, hero_name
+--     ;
 
---All Heroes--
-select localized_name as name from hero_names
-order by localized_name
-;
+--     --All Heroes--
+--     select localized_name as name from hero_names
+--     order by localized_name
+--     ;
 
---Hero Particular Queries
---Hero Vs Hero Win rate
-with hero1(p1_id) as
-(
-    select hero_id from hero_names
-    where localized_name='Axe'  --put hero 1 name here
-    limit 1 
-),
-hero2(p2_id) as
-(
-    select hero_id from hero_names
-    where localized_name='Bane'  --put hero 2 name here
-    limit 1 
-),
-foo1(match_id, hero_id, player_slot, radiant_win) as
-(
-    select match.match_id, hero_id, players.player_slot, radiant_win
-    from players, match, hero1
-    where (hero_id = hero1.p1_id and match.match_id = players.match_id)
-),
-foo2(match_id, hero_id, player_slot, radiant_win) as
-(
-    select match.match_id, hero_id, players.player_slot, radiant_win
-    from players, match, hero2
-    where (hero_id = hero2.p2_id and match.match_id = players.match_id)
-)
+--     --Hero Particular Queries
+--     --Hero Vs Hero Win rate
+--     with hero1(p1_id) as
+--     (
+--         select hero_id from hero_names
+--         where localized_name='Axe'  --put hero 1 name here
+--         limit 1 
+--     ),
+--     hero2(p2_id) as
+--     (
+--         select hero_id from hero_names
+--         where localized_name='Bane'  --put hero 2 name here
+--         limit 1 
+--     ),
+--     foo1(match_id, hero_id, player_slot, radiant_win) as
+--     (
+--         select match.match_id, hero_id, players.player_slot, radiant_win
+--         from players, match, hero1
+--         where (hero_id = hero1.p1_id and match.match_id = players.match_id)
+--     ),
+--     foo2(match_id, hero_id, player_slot, radiant_win) as
+--     (
+--         select match.match_id, hero_id, players.player_slot, radiant_win
+--         from players, match, hero2
+--         where (hero_id = hero2.p2_id and match.match_id = players.match_id)
+--     )
 
-select round(100*(h1.p1_wins/cast(h2.total_p1p2 as decimal)),2) as p1p2_winrate from
-(
-    select count(distinct foo1.match_id) as p1_wins from
-    foo1,foo2
-    where
-    (
-        foo1.match_id = foo2.match_id and
-        (
-            (foo1.player_slot < 5 and foo2.player_slot>100 and foo1.radiant_win='True')
-            or
-            (foo1.player_slot > 100 and foo2.player_slot<5 and foo1.radiant_win='False')
-        )
-    ) 
-) h1,
-(
-    select count(distinct foo1.match_id) as total_p1p2 from
-    foo1,foo2
-    where
-    (
-        foo1.match_id = foo2.match_id and
-        (
-            (foo1.player_slot < 5 and foo2.player_slot>100)
-            or
-            (foo1.player_slot > 100 and foo2.player_slot<5)
-        )
-    ) 
-) h2
-;
+--     select round(100*(h1.p1_wins/cast(h2.total_p1p2 as decimal)),2) as p1p2_winrate from
+--     (
+--         select count(distinct foo1.match_id) as p1_wins from
+--         foo1,foo2
+--         where
+--         (
+--             foo1.match_id = foo2.match_id and
+--             (
+--                 (foo1.player_slot < 5 and foo2.player_slot>100 and foo1.radiant_win='True')
+--                 or
+--                 (foo1.player_slot > 100 and foo2.player_slot<5 and foo1.radiant_win='False')
+--             )
+--         ) 
+--     ) h1,
+--     (
+--         select count(distinct foo1.match_id) as total_p1p2 from
+--         foo1,foo2
+--         where
+--         (
+--             foo1.match_id = foo2.match_id and
+--             (
+--                 (foo1.player_slot < 5 and foo2.player_slot>100)
+--                 or
+--                 (foo1.player_slot > 100 and foo2.player_slot<5)
+--             )
+--         ) 
+--     ) h2
+--     ;
 
---Top k Build Order--
-select item0, item1, item2, item3, item4, item5,
-build_count, round(100*win_rate/cast(build_count as decimal),2) as win_rate
-from hero_builds
-where rn<=3 and hero_name='Axe' --select k and name here
-;
+--     --Top k Build Order--
+--     select item0, item1, item2, item3, item4, item5,
+--     build_count, round(100*win_rate/cast(build_count as decimal),2) as win_rate
+--     from hero_builds
+--     where rn<=3 and hero_name='Axe' --select k and name here
+--     ;
 
---Top k Ability Order
---TODO
--- Ability upgrade order
-with hero1(p1_id) as
-(
-    select hero_id from hero_names
-    where localized_name='Axe'  --put hero 1 name here
-    limit 1 
-),
-hero_ability(match_id, slot, ability_name, time, hero_id) as (
-    select players.match_id, players.player_slot, ability_name, time, players.hero_id
-    from players
-    inner join hero1 on hero1.p1_id=players.hero_id
-    inner join ability_upgrades on 
-    players.match_id = ability_upgrades.match_id and
-    players.player_slot = ability_upgrades.player_slot
-    inner join ability_ids on 
-    ability_ids.ability_id = ability_upgrades.ability
-)
-select *, count(*) as count from (
-    select hero_id, array_agg(ability_name order by time) as ability_order from
-    hero_ability
-    group by hero_id, slot, match_id
-) temp
-group by hero_id, ability_order
-order by count desc
-limit 3 --Choose k here
-;
-
-
---General Queries
--- Select the top k most selected heroes
-select min as hero_name from 
-(
-    select min(localized_name), count(1) from 
-    players inner join hero_names using(hero_id)
-    group by hero_id
-    order by count desc
-    limit 10
-) foo
-;
-
---Get the percentage of radiant wins
-select round(100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from
--- select round(100*(numerator.count/cast(denominator.count as decimal) ),2)as radiant_wins from
-num_matches,
-(
-    select count(1) from match
-    where radiant_win = 'True'
-) numerator
-;
-
--- Most deadly teamfights
-select deaths, region from
-(
-    select match_id, max(deaths) as deaths
-    from teamfights
-    group by match_id
-
-) temp, match_cluster
-where temp.match_id = match_cluster.match_id
-order by deaths desc
-limit 5
-;
+--     --Top k Ability Order
+--     --TODO
+--     -- Ability upgrade order
+--     with hero1(p1_id) as
+--     (
+--         select hero_id from hero_names
+--         where localized_name='Axe'  --put hero 1 name here
+--         limit 1 
+--     ),
+--     hero_ability(match_id, slot, ability_name, time, hero_id) as (
+--         select players.match_id, players.player_slot, ability_name, time, players.hero_id
+--         from players
+--         inner join hero1 on hero1.p1_id=players.hero_id
+--         inner join ability_upgrades on 
+--         players.match_id = ability_upgrades.match_id and
+--         players.player_slot = ability_upgrades.player_slot
+--         inner join ability_ids on 
+--         ability_ids.ability_id = ability_upgrades.ability
+--     )
+--     select *, count(*) as count from (
+--         select hero_id, array_agg(ability_name order by time) as ability_order from
+--         hero_ability
+--         group by hero_id, slot, match_id
+--     ) temp
+--     group by hero_id, ability_order
+--     order by count desc
+--     limit 3 --Choose k here
+--     ;
 
 
---Item Queries
--- Early, mid, late stage items
-select * from early_game
-order by times_purchased desc;
+--     --General Queries
+--     -- Select the top k most selected heroes
+--     select min as hero_name from 
+--     (
+--         select min(localized_name), count(1) from 
+--         players inner join hero_names using(hero_id)
+--         group by hero_id
+--         order by count desc
+--         limit 10
+--     ) foo
+--     ;
 
-select * from mid_game
-order by times_purchased desc;
+--     --Get the percentage of radiant wins
+--     select round(100*(numerator.count/num_matches.num_matches ),2)as radiant_wins from
+--     -- select round(100*(numerator.count/cast(denominator.count as decimal) ),2)as radiant_wins from
+--     num_matches,
+--     (
+--         select count(1) from match
+--         where radiant_win = 'True'
+--     ) numerator
+--     ;
 
-select * from end_game
-order by times_purchased desc;
+--     -- Most deadly teamfights
+--     select deaths, region from
+--     (
+--         select match_id, max(deaths) as deaths
+--         from teamfights
+--         group by match_id
 
--- Most win rate of items
-select * from win_rate
-order by win_rate desc
-;
+--     ) temp, match_cluster
+--     where temp.match_id = match_cluster.match_id
+--     order by deaths desc
+--     limit 5
+--     ;
 
 
---Achievements
+-- --Item Queries
+--     -- Early, mid, late stage items
+--     select * from early_game
+--     order by times_purchased desc;
 
--- Filthy rich
-select account_id, localized_name, gold as gold_left
-from player_hero
-where gold > 15000
-order by gold desc
-;
+--     select * from mid_game
+--     order by times_purchased desc;
 
--- Not on my watch
-select account_id, localized_name, denies
-from player_hero
-where denies > 40
-order by denies desc
-;
+--     select * from end_game
+--     order by times_purchased desc;
 
--- Hero Farmer
-select account_id, localized_name, xp_hero
-from player_hero
-where xp_hero > 24000
-order by xp_hero desc
-;
+--     -- Most win rate of items
+--     select * from win_rate
+--     order by win_rate desc
+--     ;
 
--- Goblin slayer
-select account_id, localized_name, xp_creep
-from player_hero
-where xp_creep > 26000
-order by xp_creep desc
-;
 
--- Controller of Crowds
-select account_id, localized_name, stuns
-from player_hero
-where stuns > 300
-order by stuns desc
-;
+-- --Achievements
 
--- Good Game
-select match_id, positive_votes, region
-from match_cluster
-where positive_votes > 50
-order by positive_votes desc
-;
+--     -- Filthy rich
+--     select account_id, localized_name, gold as gold_left
+--     from player_hero
+--     where gold > 15000
+--     order by gold desc
+--     ;
 
--- Blame Game
-select match_id, negative_votes, region
-from match_cluster
-where negative_votes > 10
-order by negative_votes desc
-;
+--     -- Not on my watch
+--     select account_id, localized_name, denies
+--     from player_hero
+--     where denies > 40
+--     order by denies desc
+--     ;
+
+--     -- Hero Farmer
+--     select account_id, localized_name, xp_hero
+--     from player_hero
+--     where xp_hero > 24000
+--     order by xp_hero desc
+--     ;
+
+--     -- Goblin slayer
+--     select account_id, localized_name, xp_creep
+--     from player_hero
+--     where xp_creep > 26000
+--     order by xp_creep desc
+--     ;
+
+--     -- Controller of Crowds
+--     select account_id, localized_name, stuns
+--     from player_hero
+--     where stuns > 300
+--     order by stuns desc
+--     ;
+
+--     -- Good Game
+--     select match_id, positive_votes, region
+--     from match_cluster
+--     where positive_votes > 50
+--     order by positive_votes desc
+--     ;
+
+--     -- Blame Game
+--     select match_id, negative_votes, region
+--     from match_cluster
+--     where negative_votes > 10
+--     order by negative_votes desc
+--     ;
+
+
+--UPDATE Queries
+    --Hero Name--
+    UPDATE hero_names
+    SET localized_name = 'New Name',  --New name here
+        name = 'npc_dota_hero_new_name'
+    WHERE localized_name = 'Axe' --old name here
+    ;
+
+    --Item Name--
+    UPDATE item_ids
+    SET item_name = 'New_ItemName'  --New name here
+    WHERE item_name = 'blink' --old name here
+    ;
+
+    -- --Return to Normal
+    -- UPDATE hero_names
+    -- SET localized_name = 'Axe',  --New name here
+    --     name = 'npc_dota_hero_axe'
+    -- WHERE localized_name = 'New Name' --old name here
+    -- ;
+
+    -- --Item Name--
+    -- UPDATE item_ids
+    -- SET item_name = 'blink'  --New name here
+    -- WHERE item_name = 'New_ItemName' --old name here
+    -- ;
