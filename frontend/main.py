@@ -187,7 +187,7 @@ def query_main(query_num, sortby=None):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
     data = None
     try:
         cursor = conn.cursor()
@@ -201,12 +201,17 @@ def query_main(query_num, sortby=None):
             conn.close()
             return (header,data)
 
+all_heros_query = "hq6"
 
 app = Flask(__name__)
 
+def get_all_heroes():
+    header, data = query_main(all_heros_query)
+    return data
+
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', all_heroes = get_all_heroes())
 
 @app.route('/query',methods=['POST'])
 def askquery():
@@ -219,11 +224,17 @@ def askquery_():
     query = request.args['q']
     sortby = request.args['sort']
     header,data = query_main(query,sortby)
-    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query)
+    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query,all_heros_query=get_all_heroes())
+
+@app.route('/hero',methods=['POST'])
+def hero():
+    query = request.form['hero_name']
+    print(query)
+    return render_template('index.html',all_heroes = get_all_heroes())
 
 @app.route('/update',methods=['POST'])
 def update():
-    print(request.form)
+    print("Hi")
     return render_template('index.html')
 
 if __name__ == '__main__':

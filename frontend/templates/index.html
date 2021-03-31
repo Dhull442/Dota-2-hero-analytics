@@ -154,6 +154,53 @@ h_div {
 </div>
 {% endif %}
 
+<!-- Hero specific queries -->
+<h1 class="w3-xxxlarge w3-text-red" id="hero_specific_query"><b>Heros.</b></h1>
+<hr style="width:50px;border:5px solid red" class="w3-round">
+<p>
+    Select a hero to get it's detailed stats.
+</p>
+<form action="/hero" method="post">
+<label for="queries">Choose a Hero:</label>
+{% if all_heroes is defined %}
+<select name="hero_name" id="hero_name">
+<option value="null"></option>
+    {% for hero in all_heroes %}
+    <option value={{hero[0]}}>{{hero[0]}}</option>
+    {% endfor %}
+</select>
+{% else %}
+    <select name="query" id="query">
+    <option value="null"> No Heros available </option>
+{% endif %}
+<input type="submit" value="Submit">
+</form>
+<br>
+<!-- {% if data is defined and typequery=='h' %}
+<div class="tableFixHead" id="results1">
+<table>
+{% if header != None %}
+<thead>
+  <tr>
+  {% for h in header %}
+  <th> {{h}} </th>
+  {% endfor %}
+</tr>
+</thead>
+{% endif %}
+<tbody>
+  {% for row in data %}
+  <tr>
+    {% for x in row %}
+    <td> {{x}} </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %} -->
+
 
 <!-- # item -->
 <h1 class="w3-xxxlarge w3-text-red" id='iquery'><b>Items.</b></h1>
