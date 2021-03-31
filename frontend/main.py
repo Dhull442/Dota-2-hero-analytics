@@ -17,7 +17,38 @@ qdict = {
                                                 select count(1) from match\
                                                 where radiant_win = 'True'\
                                             ) numerator\
-                                            ;")
+                                            ;"),
+
+    "hq2":(["Hero Name", "Item Name", "Row number"],"""select hero_name, item_name, rn from
+                                                    (
+                                                        select min(item_name) as item_name, count(distinct item_id),
+                                                        min(localized_name) as hero_name,
+                                                        row_number() over(partition by hero_id order by count(distinct item_id) DESC, min(item_name)) rn
+                                                        from
+                                                        purchase_log
+                                                        inner join (
+                                                            select match_id, hero_id, player_slot
+                                                            from players
+                                                        ) players_imp using(match_id, player_slot)
+                                                        inner join hero_names using(hero_id)
+                                                        inner join item_ids using(item_id)
+                                                        group by hero_id, item_id
+                                                    ) foo
+                                                    where(
+                                                        foo.rn<7 --k
+                                                        and hero_name='Windranger'
+                                                    )
+                                                    order by hero_name, item_name
+                                                    ;"""),
+    "hq10":(["Hero Name","Matches","Pick Rate","Win Rate","Gold/min","XP/min","Damage","Healed","Tower Damage"],"""select hero_name, count(1) as num_matches_played, round(100*(count(1)/min(num_matches)),2) as pick_rate,
+                                                    round(100*(sum(won::int)/cast(count(1) as decimal)),2) as win_rate,
+                                                    avg(gpm) as gold_per_minute, avg(xppm) as xp_per_minute, avg(damage) as damage,
+                                                    avg(healing) as healing, avg(tower_damage) as tower_damage
+                                                    from player_hero_wins, num_matches
+                                                    group by hero_name
+                                                    order by pick_rate desc, win_rate desc, hero_name
+                                                    -- limit 10
+                                                    ;""")
 }
 initqueries = """
 CREATE MATERIALIZED VIEW num_matches(num_matches)
@@ -65,6 +96,7 @@ as(
 )
 ;
 """
+# no need for this
 def views_init():
     print("Initialize Views")
     conn = pg.connect(host='/var/run/postgresql',dbname='project_db', user='dhull', port='5432', password='1234')
