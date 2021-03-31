@@ -22,6 +22,9 @@ body {font-size:16px;}
 table  { border-collapse: collapse; width: 100%; }
 th, td { padding: 8px 16px; }
 th     { background:#eee; }
+h_div {
+    display: none;
+}
 </style>
 </head>
 <body>
@@ -85,7 +88,7 @@ th     { background:#eee; }
     <thead>
       <tr>
       {% for h in header %}
-      <th> {{h}} </th>
+      <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
       {% endfor %}
     </tr>
     </thead>
@@ -133,7 +136,7 @@ th     { background:#eee; }
 <thead>
   <tr>
   {% for h in header %}
-  <th> {{h}} </th>
+  <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
   {% endfor %}
 </tr>
 </thead>
@@ -180,7 +183,7 @@ th     { background:#eee; }
 <thead>
   <tr>
   {% for h in header %}
-  <th> {{h}} </th>
+  <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
   {% endfor %}
 </tr>
 </thead>
@@ -228,7 +231,7 @@ th     { background:#eee; }
 <thead>
   <tr>
   {% for h in header %}
-  <th> {{h}} </th>
+  <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
   {% endfor %}
 </tr>
 </thead>
@@ -255,6 +258,7 @@ th     { background:#eee; }
     <h1 class="w3-xxxlarge w3-text-red"><b>Update.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
       <!-- <label for="update_domain">Choose a Query:</label> -->
+      <form>
       <label for="cases">Choose a table:</label>
       <select name="cases" id="cases">
         <option value=""></option>
@@ -262,8 +266,9 @@ th     { background:#eee; }
         <option value="item">Item</option>
         <option value="player">Player</option>
       </select>
+    </form>
       <!-- <form action="/update_val" id="update_form"> -->
-        <div class="hero" id="hero">
+        <div class="h_div" id="hero_update">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Hero Name</label>
@@ -277,7 +282,7 @@ th     { background:#eee; }
         </form>
         </div>
 
-        <div class="item" id="item">
+        <div class="h_div" id="item_update">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Item Name</label>
@@ -290,7 +295,7 @@ th     { background:#eee; }
           <input type="submit" value="Submit">
        </form>
         </div>
-        <div class="player" id="player">
+        <div class="h_div" id="player_update">
           <form action="/update" method="post">
           <div class="w3-section">
             <label>Name</label>
@@ -322,7 +327,7 @@ th     { background:#eee; }
         <!-- <img src="/w3images/team2.jpg" alt="John" style="width:100%"> -->
         <div class="w3-container">
           <h3>Jay Paranjape</h3>
-          <p class="w3-opacity">2017CS10XXX</p>
+          <p class="w3-opacity">2017CS10355</p>
           <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
         </div>
       </div>
@@ -332,7 +337,7 @@ th     { background:#eee; }
         <!-- <img src="/w3images/team1.jpg" alt="Jane" style="width:100%"> -->
         <div class="w3-container">
           <h3>Saksham Dhull</h3>
-          <p class="w3-opacity">2017CS10XXX</p>
+          <p class="w3-opacity">2017CS10370</p>
           <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
         </div>
       </div>
@@ -342,7 +347,7 @@ th     { background:#eee; }
         <!-- <img src="/w3images/team3.jpg" alt="Mike" style="width:100%"> -->
         <div class="w3-container">
           <h3>Siddhant Mago</h3>
-          <p class="w3-opacity">2017CS10XXX</p>
+          <p class="w3-opacity">2017CS50419</p>
           <!-- <p>Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum.</p> -->
         </div>
       </div>
@@ -356,25 +361,19 @@ th     { background:#eee; }
 <div class="w3-light-grey w3-container w3-padding-32" style="margin-top:75px;padding-right:58px"><p class="w3-right">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></p></div>
 
 <script>
-$('#hero').hide()
-$('#item').hide()
-$('#player').hide()
-$('#sbut').hide()
 $('#cases').change(function () {
 	  var value = this.value;
-    if(this.value==""){
-      $('#hero').hide()
-
-      $('#item').hide()
-      $('#player').hide()
-      $('#sbut').hide()
+    console.log(this.value);
+        if(this.value==""){
+      $('#hero_update').display.style = "none";
+      $('#item_update').display.style = "none";
+      $('#player_update').display.style = "none";
       return;
     }
-    $('#hero').hide()
-    $('#item').hide()
-    $('#player').hide()
-    $('#' + this.value).show();
-    $('#sbut').show();
+    $('#hero_update').display.style = "none";
+    $('#item_update').display.style = "none";
+    $('#player_update').display.style = "none";
+    $('#' + this.value+'_update').display.style = "block";
 });
 function getqueryname(table_id){
   var e = document.getElementById("#"+table_id);
