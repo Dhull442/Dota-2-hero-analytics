@@ -217,14 +217,14 @@ def home():
 def askquery():
     query = request.form['query']
     header,data = query_main(query)
-    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query)
+    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query,all_heros_query=get_all_heroes())
 
 @app.route('/query',methods=['GET'])
 def askquery_():
     query = request.args['q']
     sortby = request.args['sort']
     header,data = query_main(query,sortby)
-    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query,all_heros_query=get_all_heroes())
+    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query)
 
 @app.route('/hero',methods=['POST'])
 def hero():
