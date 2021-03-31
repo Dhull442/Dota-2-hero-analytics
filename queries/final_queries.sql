@@ -1,146 +1,281 @@
--- --Index
--- create index player_indx on players(hero_id);
--- create index hero_names_indx on hero_names(hero_id);
--- create index purchase_indx on purchase_log(match_id)
--- ;
--- create index match_indx on match(match_id)
--- ;
--- create index player_indx_2 on players(match_id, player_slot)
--- ;
+--Index
+create index player_indx on players(hero_id);
+create index hero_names_indx on hero_names(hero_id);
+create index purchase_indx on purchase_log(match_id)
+;
+create index match_indx on match(match_id)
+;
+create index player_indx_2 on players(match_id, player_slot)
+;
 
--- create index ability_upgarde_indx_2 on ability_upgrades(match_id, player_slot)
--- ;
+create index ability_upgarde_indx_2 on ability_upgrades(match_id, player_slot)
+;
 
--- create index ability_indx_2 on ability_ids(ability_id)
--- ;
+create index ability_indx_2 on ability_ids(ability_id)
+;
+
+drop materialized view num_matches;
+drop materialized view player_hero_wins;
+drop materialized view hero_builds;
+drop materialized view player_hero;
+drop materialized view match_cluster;
+drop materialized view win_rate;
+drop materialized view early_game;
+drop materialized view mid_game;
+drop materialized view end_game;
 
 
--- --Materialized Views in the Database
--- CREATE MATERIALIZED VIEW num_matches(num_matches)
--- as(
---     select cast(count(1) as decimal) from match
--- );
+--Materialized Views in the Database
+CREATE MATERIALIZED VIEW num_matches(num_matches)
+as(
+    select cast(count(1) as decimal) from match
+);
 
--- CREATE MATERIALIZED VIEW player_hero_wins(match_id, hero_name, player_slot, won, gpm, xppm, damage, healing, tower_damage, K, D, A)
--- as(
---     select players.match_id, hero_names.localized_name as hero_name, player_slot, 
---     ((radiant_win='True' AND player_slot<5) OR (radiant_win='False' AND player_slot>100)), 
---     gold_per_min, xp_per_min, hero_damage, hero_healing, tower_damage,
---     kills,deaths, assists
---     from players, match, hero_names
---     where(
---         match.match_id = players.match_id and
---         players.hero_id = hero_names.hero_id
---     )
--- );
+CREATE OR REPLACE FUNCTION refresh_num_matches()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY num_matches;
+    RETURN NULL;
+END;
+$$;
 
--- CREATE MATERIALIZED VIEW hero_builds(hero_name, item0, item1, item2, item3, item4, item5,
--- build_count, win_rate, rn)
--- as(
---     select localized_name, item0.item_name, item1.item_name, item2.item_name, 
---     item3.item_name, item4.item_name, item5.item_name, count, wr,
---     row_number() over(partition by localized_name
---     order by count DESC, wr DESC, item0.item_name, item1.item_name, item2.item_name, item3.item_name, item4.item_name, item5.item_name) rn
---     from
---     (
---         select localized_name, item_0, item_1, item_2,item_3, item_4, item_5,
---         count(1), 
---         sum(((radiant_win='True' AND player_slot<5) OR (radiant_win='False' AND player_slot>100))::int) as wr
---         from hero_names, players, match
---         where(
---             hero_names.hero_id = players.hero_id AND
---             match.match_id = players.match_id
---         )
---         group by localized_name, item_0, item_1, item_2, item_3, item_4, item_5
---     ) dummy
---     inner join item_ids as item0 on(dummy.item_0=item0.item_id)
---     inner join item_ids as item1 on(dummy.item_1=item1.item_id)
---     inner join item_ids as item2 on(dummy.item_2=item2.item_id)
---     inner join item_ids as item3 on(dummy.item_3=item3.item_id)
---     inner join item_ids as item4 on(dummy.item_4=item4.item_id)
---     inner join item_ids as item5 on(dummy.item_5=item5.item_id)
--- )
--- ;
+CREATE MATERIALIZED VIEW player_hero_wins(match_id, hero_name, player_slot, won, gpm, xppm, damage, healing, tower_damage, K, D, A)
+as(
+    select players.match_id, hero_names.localized_name as hero_name, player_slot, 
+    ((radiant_win='True' AND player_slot<5) OR (radiant_win='False' AND player_slot>100)), 
+    gold_per_min, xp_per_min, hero_damage, hero_healing, tower_damage,
+    kills,deaths, assists
+    from players, match, hero_names
+    where(
+        match.match_id = players.match_id and
+        players.hero_id = hero_names.hero_id
+    )
+);
 
--- create materialized view player_hero(account_id, hero_id, localized_name, gold, denies, 
--- xp_hero, xp_creep, stuns) as (
---     select account_id, hero_names.hero_id, localized_name, gold as gold_left, denies,
---     xp_hero, xp_creep, 
---     (
---         case 
---         when stuns = 'None' then 0
---         else cast(stuns as float)
---         end
---     ) as stuns
---     from players
---     inner join hero_names on hero_names.hero_id = players.hero_id
--- );
+CREATE OR REPLACE FUNCTION refresh_player_hero_wins()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY player_hero_wins;
+    RETURN NULL;
+END;
+$$;
 
--- create materialized view match_cluster(match_id, region) as (
---     select match_id, region 
---     from match
---     inner join cluster_regions on match.cluster = cluster_regions.cluster
--- )
--- ;
+CREATE MATERIALIZED VIEW hero_builds(hero_name, item0, item1, item2, item3, item4, item5,
+build_count, win_rate, rn)
+as(
+    select localized_name, item0.item_name, item1.item_name, item2.item_name, 
+    item3.item_name, item4.item_name, item5.item_name, count, wr,
+    row_number() over(partition by localized_name
+    order by count DESC, wr DESC, item0.item_name, item1.item_name, item2.item_name, item3.item_name, item4.item_name, item5.item_name) rn
+    from
+    (
+        select localized_name, item_0, item_1, item_2,item_3, item_4, item_5,
+        count(1), 
+        sum(((radiant_win='True' AND player_slot<5) OR (radiant_win='False' AND player_slot>100))::int) as wr
+        from hero_names, players, match
+        where(
+            hero_names.hero_id = players.hero_id AND
+            match.match_id = players.match_id
+        )
+        group by localized_name, item_0, item_1, item_2, item_3, item_4, item_5
+    ) dummy
+    inner join item_ids as item0 on(dummy.item_0=item0.item_id)
+    inner join item_ids as item1 on(dummy.item_1=item1.item_id)
+    inner join item_ids as item2 on(dummy.item_2=item2.item_id)
+    inner join item_ids as item3 on(dummy.item_3=item3.item_id)
+    inner join item_ids as item4 on(dummy.item_4=item4.item_id)
+    inner join item_ids as item5 on(dummy.item_5=item5.item_id)
+)
+;
 
--- create materialized view win_rate(item_name, win_rate) as (
---     select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
---     (
---         select item_id, avg(
---             case when player_slot <= 3 and radiant_win = 'True' then 1
---             when player_slot > 3 and radiant_win = 'False' then 1
---             else 0
---             end
---         ) as win_rate from 
---         purchase_log
---         inner join match on match.match_id = purchase_log.match_id
---         group by item_id
---     ) temp
---     inner join item_ids on  item_ids.item_id = temp.item_id
---     order by win_rate desc
--- );
+CREATE OR REPLACE FUNCTION refresh_hero_builds()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY hero_builds;
+    RETURN NULL;
+END;
+$$;
 
--- create materialized view early_game(item_name, times_purchased) as (
---     select item_ids.item_name, times_purchased from 
---     (
---         select item_id, count(*) as times_purchased, 
---         rank() over (order by count(*) desc) 
---         from purchase_log
---         where time < 0
---         group by item_id
---     ) as temp
---     inner join item_ids on temp.item_id = item_ids.item_id
---     order by rank
+create materialized view player_hero(account_id, hero_id, localized_name, gold, denies, 
+xp_hero, xp_creep, stuns) as (
+    select account_id, hero_names.hero_id, localized_name, gold as gold_left, denies,
+    xp_hero, xp_creep, 
+    (
+        case 
+        when stuns = 'None' then 0
+        else cast(stuns as float)
+        end
+    ) as stuns
+    from players
+    inner join hero_names on hero_names.hero_id = players.hero_id
+);
+
+CREATE OR REPLACE FUNCTION refresh_player_hero()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY player_hero;
+    RETURN NULL;
+END;
+$$;
+
+create materialized view match_cluster(match_id, positive_votes, negative_votes,region) as (
+    select match_id, positive_votes,negative_votes, region 
+    from match
+    inner join cluster_regions on match.cluster = cluster_regions.cluster
+)
+;
+CREATE OR REPLACE FUNCTION refresh_match_cluster()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY match_cluster;
+    RETURN NULL;
+END;
+$$;
+
+create materialized view win_rate(item_name, win_rate) as (
+    select item_ids.item_name, round(win_rate * 100, 2) as win_rate from 
+    (
+        select item_id, avg(
+            case when player_slot <= 3 and radiant_win = 'True' then 1
+            when player_slot > 3 and radiant_win = 'False' then 1
+            else 0
+            end
+        ) as win_rate from 
+        purchase_log
+        inner join match on match.match_id = purchase_log.match_id
+        group by item_id
+    ) temp
+    inner join item_ids on  item_ids.item_id = temp.item_id
+    order by win_rate desc
+);
+CREATE OR REPLACE FUNCTION refresh_win_rate()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY win_rate;
+    RETURN NULL;
+END;
+$$;
+
+create materialized view early_game(item_name, times_purchased) as (
+    select item_ids.item_name, times_purchased from 
+    (
+        select item_id, count(*) as times_purchased, 
+        rank() over (order by count(*) desc) 
+        from purchase_log
+        where time < 0
+        group by item_id
+    ) as temp
+    inner join item_ids on temp.item_id = item_ids.item_id
+    order by rank
     
--- );
+);
 
--- create materialized view mid_game(item_name, times_purchased) as (
---     select item_ids.item_name, times_purchased from 
---     (
---         select item_id, count(*) as times_purchased, 
---         rank() over (order by count(*) desc) 
---         from purchase_log
---         where time < 1500 and
---         time > 500
---         group by item_id
---     ) as temp
---     inner join item_ids on temp.item_id = item_ids.item_id
---     order by rank
+create materialized view mid_game(item_name, times_purchased) as (
+    select item_ids.item_name, times_purchased from 
+    (
+        select item_id, count(*) as times_purchased, 
+        rank() over (order by count(*) desc) 
+        from purchase_log
+        where time < 1500 and
+        time > 500
+        group by item_id
+    ) as temp
+    inner join item_ids on temp.item_id = item_ids.item_id
+    order by rank
     
--- );
+);
 
--- create materialized view end_game(item_name, times_purchased) as (
---     select item_ids.item_name, times_purchased from 
---     (
---         select item_id, count(*) as times_purchased, 
---         rank() over (order by count(*) desc) 
---         from purchase_log
---         where time > 2000
---         group by item_id
---     ) as temp
---     inner join item_ids on temp.item_id = item_ids.item_id
---     order by rank
--- );
+create materialized view end_game(item_name, times_purchased) as (
+    select item_ids.item_name, times_purchased from 
+    (
+        select item_id, count(*) as times_purchased, 
+        rank() over (order by count(*) desc) 
+        from purchase_log
+        where time > 2000
+        group by item_id
+    ) as temp
+    inner join item_ids on temp.item_id = item_ids.item_id
+    order by rank
+);
+
+CREATE OR REPLACE FUNCTION refresh_gametime_items()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW CONCURRENTLY early_game;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY mid_game;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY end_game;
+    RETURN NULL;
+END;
+$$;
+
+--Rules and Triggers
+CREATE TRIGGER refresh_num_matches AFTER INSERT OR UPDATE OR DELETE
+ON match
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_num_matches();
+
+CREATE TRIGGER refresh_player_hero_wins AFTER INSERT OR UPDATE OR DELETE
+ON hero_names
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_player_hero_wins();
+
+CREATE TRIGGER refresh_player_hero_wins AFTER INSERT OR UPDATE OR DELETE
+ON players
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_player_hero_wins();
+
+CREATE TRIGGER refresh_player_hero_wins AFTER INSERT OR UPDATE OR DELETE
+ON match
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_player_hero_wins();
+
+CREATE TRIGGER refresh_hero_builds AFTER INSERT OR UPDATE OR DELETE
+ON hero_names
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_hero_builds();
+
+CREATE TRIGGER refresh_hero_builds AFTER INSERT OR UPDATE OR DELETE
+ON players
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_hero_builds();
+
+CREATE TRIGGER refresh_hero_builds AFTER INSERT OR UPDATE OR DELETE
+ON match
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_hero_builds();
+
+CREATE TRIGGER refresh_hero_builds AFTER INSERT OR UPDATE OR DELETE
+ON item_ids
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_hero_builds();
+
+CREATE TRIGGER refresh_player_hero AFTER INSERT OR UPDATE OR DELETE
+ON players
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_player_hero();
+
+CREATE TRIGGER refresh_player_hero AFTER INSERT OR UPDATE OR DELETE
+ON hero_names
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_player_hero();
+
+CREATE TRIGGER refresh_match_cluster AFTER INSERT OR UPDATE OR DELETE
+ON match
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_match_cluster();
+
+CREATE TRIGGER refresh_match_cluster AFTER INSERT OR UPDATE OR DELETE
+ON cluster_regions
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_match_cluster();
+
+CREATE TRIGGER refresh_win_rate AFTER INSERT OR UPDATE OR DELETE
+ON purchase_log
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_win_rate();
+
+CREATE TRIGGER refresh_win_rate AFTER INSERT OR UPDATE OR DELETE
+ON item_ids
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_win_rate();
+
+CREATE TRIGGER refresh_win_rate AFTER INSERT OR UPDATE OR DELETE
+ON match
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_win_rate();
+
+CREATE TRIGGER refresh_gametime_items AFTER INSERT OR UPDATE OR DELETE
+ON item_ids
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_gametime_items();
+
+CREATE TRIGGER refresh_gametime_items AFTER INSERT OR UPDATE OR DELETE
+ON purchase_log
+FOR EACH STATEMENT EXECUTE PROCEDURE refresh_gametime_items();
 
 --Hero Queries
 
