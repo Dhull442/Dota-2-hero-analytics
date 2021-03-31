@@ -33,9 +33,10 @@ th     { background:#eee; }
     <h3 class="w3-padding-64"><b>Dota-2<br>Hero Analytics</b></h3>
   </div>
   <div class="w3-bar-block">
-    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
-    <a href="#hero_query" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Heros</a>
-    <a href="#item_query" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Items</a>
+    <a href="#gquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
+    <a href="#hquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Heros</a>
+    <a href="#iquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Items</a>
+    <a href="#aquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Achievements</a>
     <a href="#updates" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Update/Add </a>
     <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Team</a>
 
@@ -57,7 +58,7 @@ th     { background:#eee; }
   <!-- Header -->
   <div class="w3-container" style="margin-top:80px" id="queries">
     <h1 class="w3-jumbo"><b>Analytics and Tools</b></h1>
-    <h1 class="w3-xxxlarge w3-text-red"><b>General.</b></h1>
+    <h1 class="w3-xxxlarge w3-text-red" id="gquery"><b>General.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
       and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
@@ -68,16 +69,16 @@ th     { background:#eee; }
   <select name="query" id="query">
     <option value="null"></option>
     <option value="gq1">Top k heroes most selected</option>
-    <option value="gq3">Percentage of radiant wins</option>
+    <option value="gq2">Most deadly teamfights</option>
+    <option value="gq3">Percentage of Radiant Wins</option>
     <option value="gq4">Percentage of Dire Wins</option>
-    <option value="gq5">Overall Starter items</option>
   </select>
   <input type="submit" value="Submit">
 </form>
-
-{% if data is defined and typequery=='g' %}
-<button type="button" onclick="download_table_as_csv('results');">Download as CSV</button>
 <br>
+{% if data is not none and typequery=='g' %}
+<p id="query_val"></p>
+<button type="button" onclick="download_table_as_csv('results');">Download as CSV</button>
 <div class="tableFixHead" id="results">
   <table>
     {% if header != None %}
@@ -103,7 +104,7 @@ th     { background:#eee; }
 {% endif %}
 
 <!-- # heros -->
-<h1 class="w3-xxxlarge w3-text-red" id="hero_query"><b>Heros.</b></h1>
+<h1 class="w3-xxxlarge w3-text-red" id="hquery"><b>Heros.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
 <p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
   and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
@@ -113,14 +114,19 @@ th     { background:#eee; }
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
-<option value="hq2">Most common hero-item pairs</option>
-<option value="hq10">Hero Stats</option>
-
+<option value="hq1">Most Played Heroes</option>
+<option value="hq2">Win Rate</option>
+<option value="hq3">Game Impact</option>
+<option value="hq4">Economy</option>
+<option value="hq5">Damage and Healing</option>
+<option value="hq6">All Heroes</option>
 </select>
 <input type="submit" value="Submit">
 </form>
 <br>
-{% if data is defined and typequery=='h' %}
+{% if data is not none and typequery=='h' %}
+<p id="query_val"></p>
+<button type="button" onclick="download_table_as_csv('results1');">Download as CSV</button>
 <div class="tableFixHead" id="results1">
 <table>
 {% if header != None %}
@@ -147,25 +153,27 @@ th     { background:#eee; }
 
 
 <!-- # item -->
-<h1 class="w3-xxxlarge w3-text-red" id='item_query'><b>Items.</b></h1>
+<h1 class="w3-xxxlarge w3-text-red" id='iquery'><b>Items.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
-  and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
-   by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different heros.
+<p>Items are things heros can purchase in order to strengthen themselves.
 </p>
 <form action="/query" method="post">
 <label for="queries">Choose a Query:</label>
 <select name="query" id="query">
 <option value="null"></option>
-<option value="iq1">Top k heroes most selected</option>
-<option value="iq3">Percentage of radiant wins</option>
-<option value="iq4">Percentage of Dire Wins</option>
-<option value="iq5">Overall Starter items</option>
+<option value="iq1">Early game items</option>
+<option value="iq2">Mid game items</option>
+<option value="iq3">Late game items</option>
+<option value="iq4">Item win rate</option>
 </select>
 <input type="submit" value="Submit">
 </form>
 <br>
-{% if data is defined and typequery=='i' %}
+{% if data is not none and typequery=='i' %}
+<p id="query_val"></p>
+
+<button type="button" onclick="download_table_as_csv('results2');">Download as CSV</button>
+
 <div class="tableFixHead" id="results2">
 <table>
 {% if header != None %}
@@ -189,14 +197,64 @@ th     { background:#eee; }
 </table>
 </div>
 {% endif %}
+
+<!-- # Achievements -->
+<h1 class="w3-xxxlarge w3-text-red" id="aquery"><b>Achievements.</b></h1>
+<hr style="width:50px;border:5px solid red" class="w3-round">
+<p>Achievements earned by different heroes
+</p>
+<form action="/query" method="post">
+<label for="queries">Choose a Query:</label>
+<select name="query" id="query">
+<option value="null"></option>
+<option value="aq1">Filthy Rich</option>
+<option value="aq2">Not on my watch</option>
+<option value="aq3">Hero farmer</option>
+<option value="aq4">Goblin slayer</option>
+<option value="aq5">Controller of crowds</option>
+<option value="aq6">Good game</option>
+<option value="aq7">Blame game</option>
+</select>
+<input type="submit" value="Submit">
+</form>
+<br>
+{% if data is not none and typequery=='a' %}
+
+<p id="query_val"></p>
+<button type="button" onclick="download_table_as_csv('results3');">Download as CSV</button>
+<div class="tableFixHead" id="results3">
+<table>
+{% if header != None %}
+<thead>
+  <tr>
+  {% for h in header %}
+  <th> {{h}} </th>
+  {% endfor %}
+</tr>
+</thead>
+{% endif %}
+<tbody>
+  {% for row in data %}
+  <tr>
+    {% for x in row %}
+    <td> {{x}} </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+
   </div>
+
+
 
   <!-- Services -->
   <div class="w3-container" id="updates" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Update.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
       <!-- <label for="update_domain">Choose a Query:</label> -->
-    <form action="/update">
       <label for="cases">Choose a table:</label>
       <select name="cases" id="cases">
         <option value=""></option>
@@ -206,6 +264,7 @@ th     { background:#eee; }
       </select>
       <!-- <form action="/update_val" id="update_form"> -->
         <div class="hero" id="hero">
+          <form action="/update" method="post">
           <div class="w3-section">
             <label>Hero Name</label>
             <input class="w3-input w3-border" type="text" name="Name" required>
@@ -214,8 +273,12 @@ th     { background:#eee; }
             <label>Hero game name</label>
             <input class="w3-input w3-border" type="text" name="Email" required>
           </div>
+          <input type="submit" value="Submit">
+        </form>
         </div>
+
         <div class="item" id="item">
+          <form action="/update" method="post">
           <div class="w3-section">
             <label>Item Name</label>
             <input class="w3-input w3-border" type="text" name="Name" required>
@@ -224,8 +287,11 @@ th     { background:#eee; }
             <label>Item id</label>
             <input class="w3-input w3-border" type="text" name="Email" required>
           </div>
+          <input type="submit" value="Submit">
+       </form>
         </div>
         <div class="player" id="player">
+          <form action="/update" method="post">
           <div class="w3-section">
             <label>Name</label>
             <input class="w3-input w3-border" type="text" name="Name" required>
@@ -238,9 +304,9 @@ th     { background:#eee; }
             <label>Message</label>
             <input class="w3-input w3-border" type="text" name="Message" required>
           </div>
+          <input type="submit" value="Submit">
+       </form>
         </div>
-        <input type="submit" value="Submit">
-      </form>
     </div>
 
   <!-- Designers -->
@@ -310,7 +376,11 @@ $('#cases').change(function () {
     $('#' + this.value).show();
     $('#sbut').show();
 });
-
+function getqueryname(table_id){
+  var e = document.getElementById("#"+table_id);
+  var strUser = e.options[{{qq}}].text;
+  document.getElementById('query_val').innerHTML = strUser;
+}
 </script>
 <script>
 // Quick and simple export target #table_id into a csv
@@ -345,6 +415,12 @@ function download_table_as_csv(table_id, separator = ',') {
 }
 </script>
 <script>
+$(document).ready(function () {
+    // Handler for .ready() called.
+    $('html, body').animate({
+        scrollTop: $('#'+{{typequery}}+'query').offset().top
+    }, 'slow');
+});
 // Script to open and close sidebar
 function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
