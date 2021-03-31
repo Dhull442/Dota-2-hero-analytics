@@ -145,7 +145,7 @@ qdict = {
     ),
     "aq5":(
         ["Hero Name", "Stuns"],\
-        'select ocalized_name, stuns\
+        'select localized_name, stuns\
         from player_hero\
         where stuns > 300\
         order by stuns desc\
@@ -216,7 +216,7 @@ as(
 """
 def views_init():
     print("Initialize Views")
-    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='')
     try:
         cursor = conn.cursor()
         cursor.execute(initqueries)
@@ -234,7 +234,7 @@ def query_main(query_num):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    conn = pg.connect(host='localhost',dbname='project_db', user='postgres', port='5432', password='')
     data = None
     try:
         cursor = conn.cursor()
