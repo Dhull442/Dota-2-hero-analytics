@@ -99,7 +99,11 @@ h_div {
     <thead>
       <tr>
       {% for h in header %}
-      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}" ><i class="material-icons w3-small">swap_vert</i></a> </th>
+      {% if h == prevh %}
+        <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=desc" ><i class="material-icons w3-small">arrow_downward</i></a> </th>
+      {% else %}
+      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=asc" ><i class="material-icons w3-small">arrow_upward</i></a> </th>
+      {% endif %}
       {% endfor %}
     </tr>
     </thead>
@@ -154,9 +158,13 @@ h_div {
 {% if header != None %}
 <thead>
   <tr>
-  {% for h in header %}
-  <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}" ><i class="material-icons w3-small">swap_vert</i></a> </th>
-  {% endfor %}
+    {% for h in header %}
+    {% if h == prevh %}
+      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=desc" ><i class="material-icons w3-small">arrow_downward</i></a> </th>
+    {% else %}
+    <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=asc" ><i class="material-icons w3-small">arrow_upward</i></a> </th>
+    {% endif %}
+    {% endfor %}
 </tr>
 </thead>
 {% endif %}
@@ -268,9 +276,13 @@ h_div {
 {% if header != None %}
 <thead>
   <tr>
-  {% for h in header %}
-  <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
-  {% endfor %}
+    {% for h in header %}
+    {% if h == prevh %}
+      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=desc" ><i class="material-icons w3-small">arrow_downward</i></a> </th>
+    {% else %}
+    <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=asc" ><i class="material-icons w3-small">arrow_upward</i></a> </th>
+    {% endif %}
+    {% endfor %}
 </tr>
 </thead>
 {% endif %}
@@ -461,6 +473,11 @@ h_div {
 <script>
 document.getElementById('{{prevq}}').className += 'w3-red';
 document.getElementById('{{typequery}}'+'query').scrollIntoView();
+</script>
+{% endif %}
+{% if prev_hero_name is defined %}
+<script>
+document.getElementById('hero_name').value = '{{prev_hero_name}}';
 </script>
 {% endif %}
 <script>

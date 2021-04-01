@@ -275,11 +275,11 @@ qdict = {
     )
 }
 
-def query_main(query_num, sortby=None, hero_name=None):
+def query_main(query_num, sortby=None, hero_name=None, order=None):
     if(query_num in qdict.keys()):
         header,cols,query = qdict[query_num]
         if(sortby is not None):
-            query = 'select * from (' + query[:-1] +') as foo order by '+ cols[header.index(sortby)] +';'
+            query = 'select * from (' + query[:-1] +') as foo order by '+ cols[header.index(sortby)] + ' ' +order +';'
 
         if hero_name is not None and query_num.startswith("hsq"):
             if query_num == "hsq1":
@@ -330,15 +330,19 @@ def askquery():
 def askquery_():
     query = request.args['q']
     sortby = request.args['sort']
-    header,data = query_main(query,sortby)
-    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros())
+    order = request.args['order']
+    header,data = query_main(query,sortby,order=order)
+    if(order=='desc'):
+        return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros())
+    else:
+        return render_template('index.html',header=header,data = data,prevh = sortby,typequery=query[0],prevq=query, all_heros = get_all_heros())
 
 @app.route('/hero',methods=['POST'])
 def hero():
     query = request.form['query']
     hero_name = request.form['hero_name']
     header,data = query_main(query,hero_name = hero_name)
-    return render_template('index.html',header=header,data = data,typequery="hs",prevq=query,all_heros = get_all_heros())
+    return render_template('index.html',header=header,data = data,typequery="hs",prev_hero_name=hero_name,prevq=query,all_heros = get_all_heros())
 
 @app.route('/update',methods=['POST'])
 def update():
