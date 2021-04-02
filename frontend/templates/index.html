@@ -34,8 +34,8 @@ h_div {
 <nav class="w3-sidebar w3-red w3-collapse w3-top w3-large w3-padding" style="z-index:3;width:300px;font-weight:bold;" id="mySidebar"><br>
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft" style="width:100%;font-size:22px">Close Menu</a>
   <div class="w3-container">
-    <h3 class="w3-padding-64"><b>
-      <img src="/static/dota-2_white.png" alt="" style="height: 180px;width: 180px">
+    <h3 class="w3-padding-64"><a href="/"><b>
+      <img src="/static/dota-2_white.png" alt="" style="height: 180px;width: 180px"></a>
       <br>Hero Analytics</b></h3>
   </div>
   <div class="w3-bar-block">
@@ -407,7 +407,7 @@ h_div {
           </div>
           <div class="w3-section">
             <label>New Hero name</label>
-            <input class="w3-input w3-border" type="text" name="new_name" value="New Name" required>
+            <input class="w3-input w3-border" type="text" name="new_name" placeholder="New name" value="" required>
           </div>
           <input style="display: none;" name="password" type="text" value="" id="pass1"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
@@ -433,7 +433,7 @@ h_div {
           </div>
           <div class="w3-section">
             <label>New item name</label>
-            <input class="w3-input w3-border" type="text" name="new_name" required>
+            <input class="w3-input w3-border" type="text" name="new_name" placeholder="New name" required>
           </div>
           <input style="display: none;" name="password" type="text" value="" id="pass2"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
@@ -483,7 +483,7 @@ h_div {
           <form action="/add" method="post" onsubmit="getval('pass3')">
           <div class="w3-section">
             <label>New Hero name</label>
-            <input class="w3-input w3-border" type="text" name="new_hero" value="New Name" required>
+            <input class="w3-input w3-border" type="text" name="new_hero" placeholder="New name" value="" required>
           </div>
           <input style="display: none;" name="password" type="text" value="" id="pass3"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
@@ -494,7 +494,7 @@ h_div {
           <form action="/add" method="post" onsubmit="getval('pass4')">
           <div class="w3-section">
             <label>New item name</label>
-            <input class="w3-input w3-border" type="text" name="new_item" required>
+            <input class="w3-input w3-border" type="text" name="new_item" placeholder="New name" value="" required>
           </div>
           <input style="display: none;" name="password" type="text" value="" id="pass4"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
@@ -562,7 +562,7 @@ h_div {
             <form action="/delete" method="post" onsubmit="getval('pass7')">
             <div class="w3-section">
               <label>Enter match id to delete</label>
-              <input class="w3-input w3-border" type="text" name="match_id" required>
+              <input class="w3-input w3-border" type="text" name="match_id" placeholder="match id" required>
             </div>
             <input style="display: none;" name="password" type="text" value="" id="pass7"/>
             <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
@@ -572,9 +572,9 @@ h_div {
             <form action="/delete" method="post" onsubmit="getval('pass8')">
             <div class="w3-section">
               <label>Enter region of whose matches have to be deleted</label>
-              <input class="w3-input w3-border" type="text" name="region" required>
+              <input class="w3-input w3-border" type="text" name="region" placeholder="Region Name" required>
             </div>
-            <input style="display: none;" name="password" type="text" value="" id="pass8"/>
+            <input style="display: none;" name="password" type="text"  value="" id="pass8"/>
             <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
          </form>
           </div>
@@ -582,7 +582,7 @@ h_div {
             <form action="/delete" method="post" onsubmit="getval('pass9')">
             <div class="w3-section">
               <label>Enter account id of whose matches have to be deleted</label>
-              <input class="w3-input w3-border" type="text" name="account_id" required>
+              <input class="w3-input w3-border" type="text" name="account_id" placeholder="Account_id" required>
             </div>
             <input style="display: none;" name="password" type="text" value="" id="pass9"/>
             <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
