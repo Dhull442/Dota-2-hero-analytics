@@ -118,6 +118,10 @@ qdict = {
         'select item_name, win_rate from win_rate\
         order by win_rate desc;'
     ),
+    "iq5":(
+        ["Item Name"],["item_name"],
+        'select item_name from item_ids;'
+    ),
 
     "aq1":(
         ["Hero Name", "Gold Left"],["localized_name","gold"],
@@ -292,8 +296,8 @@ def query_main(query_num, sortby=None, hero_name=None, order=None):
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    # conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
-    conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    # conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
 
     data = None
     try:
