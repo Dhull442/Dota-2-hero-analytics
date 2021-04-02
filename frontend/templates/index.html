@@ -40,7 +40,7 @@ h_div {
   </div>
   <div class="w3-bar-block">
     <a href="#gquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
-    <a href="#hquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Heros</a>
+    <a href="#hquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Heroes</a>
     <a href="#hsquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Hero specific</a>
     <a href="#iquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Items</a>
     <a href="#aquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Achievements</a>
@@ -69,14 +69,14 @@ h_div {
     <h1 class="w3-jumbo"><b>Analytics and Tools</b></h1>
     <h1 class="w3-xxxlarge w3-text-red" id="gquery"><b>General.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>General queries regarding heros, items and matches.
+    <p>General queries regarding Heroes, items and matches.
 </p>
 <form action='/query' method="post" style="display: none;" id="hidden_form">
   <input id="queryvalue" name="query" value=""/>
 </form>
 <div class="w3-bar w3-black">
-  <button class="w3-bar-item w3-button" onclick="fillform('gq1')" id="gq1">Most selected heros</button>
-  <button class="w3-bar-item w3-button" onclick="fillform('gq2')" id="gq2">Most deadly teamfights</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('gq1')" id="gq1">Most selected Heroes</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('gq2')" id="gq2">Most deadly teamfights by region</button>
   <button class="w3-bar-item w3-button" onclick="fillform('gq3')" id="gq3">Percentage of Radiant Wins</button>
   <button class="w3-bar-item w3-button" onclick="fillform('gq4')" id="gq4">Percentage of Dire Wins</button>
 </div>
@@ -123,16 +123,16 @@ h_div {
 </div>
 {% endif %}
 
-<!-- # heros -->
-<h1 class="w3-xxxlarge w3-text-red" id="hquery"><b>Heros.</b></h1>
+<!-- # Heroes -->
+<h1 class="w3-xxxlarge w3-text-red" id="hquery"><b>Heroes.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
 <p>Heroes are the foundation of every Dota experience. Every hero has the potential to completely change the dynamic of a team,
   and every player can completely change the dynamic of a hero. We here are showing the analysis done from over hundreds of matches played
-   by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different heros.
+   by various players from various countries with a wide spectrum of skill and talent to demonstrate the statistics about different Heroes.
 </p>
 <div class="w3-bar w3-black">
   <button class="w3-bar-item w3-button" onclick="fillform('hq1')" id="hq1">Most Played Heroes</button>
-  <button class="w3-bar-item w3-button" onclick="fillform('hq2')" id="hq2">Win Rate</button>
+  <button class="w3-bar-item w3-button" onclick="fillform('hq2')" id="hq2">Win Rate for Each Hero</button>
   <button class="w3-bar-item w3-button" onclick="fillform('hq3')" id="hq3">Game Impact</button>
   <button class="w3-bar-item w3-button" onclick="fillform('hq4')" id="hq4">Economy</button>
   <button class="w3-bar-item w3-button" onclick="fillform('hq5')" id="hq5">Damage and Healing</button>
@@ -213,14 +213,14 @@ h_div {
     </select>
     {% else %}
         <select name="query" id="query">
-        <option value="null"> No Heros available </option>
+        <option value="null"> No Heroes available </option>
     </select>
     {% endif %}
 </div>
 <div class="w3-bar w3-black">
   <button class="w3-bar-item w3-button" onclick="fillform2('hsq1')" id="hsq1">Most common item build</button>
-  <button class="w3-bar-item w3-button" onclick="fillform2('hsq2')" id="hsq2">Hero against stats</button>
-  <button class="w3-bar-item w3-button" onclick="fillform2('hsq3')" id="hsq3">Most Common ability upgrade</button>
+  <button class="w3-bar-item w3-button" onclick="fillform2('hsq2')" id="hsq2">Hero-vs-Hero Stats</button>
+  <button class="w3-bar-item w3-button" onclick="fillform2('hsq3')" id="hsq3">Most Common ability upgrades by level</button>
 </div>
 <br>
 {% if data is defined and data != None and typequery=='hs' %}
@@ -252,7 +252,7 @@ h_div {
 <!-- # item -->
 <h1 class="w3-xxxlarge w3-text-red" id='iquery'><b>Items.</b></h1>
 <hr style="width:50px;border:5px solid red" class="w3-round">
-<p>Items are things heros can purchase in order to strengthen themselves.</p>
+<p>Items are things Heroes can purchase in order to strengthen themselves.</p>
 <div class="w3-bar w3-black">
   <button class="w3-bar-item w3-button" onclick="fillform('iq5')" id="iq5">All Items</button>
   <button class="w3-bar-item w3-button" onclick="fillform('iq1')" id="iq1">Early game items</button>
@@ -334,6 +334,7 @@ h_div {
 </form> -->
 <br>
 {% if data is not none and typequery=='a' %}
+<p id='query_explain'></p>
 <button type="button" class="w3-button w3-white w3-border w3-border-red w3-round" onclick="download_table_as_csv('results3');"><i class="material-icons w3-small">file_download</i> Download as CSV</button>
 <div class="tableFixHead" id="results3">
 <table>
@@ -400,7 +401,7 @@ h_div {
             </select>
             {% else %}
                 <select name="query" id="query">
-                <option value="null"> No Heros available </option>
+                <option value="null"> No Heroes available </option>
             </select>
             {% endif %}
           </div>
@@ -527,7 +528,7 @@ h_div {
             </select>
             {% else %}
                 <select name="query" id="query">
-                <option value="null"> No Heros available </option>
+                <option value="null"> No Heroes available </option>
             </select>
             {% endif %}
           </div>
@@ -640,9 +641,45 @@ document.getElementById('{{prevq}}').className += 'w3-red';
 document.getElementById('{{typequery}}'+'query').scrollIntoView();
 </script>
 {% endif %}
+{% if typequery=='a' %}
+<script type="text/javascript">
+var value = "";
+switch('{{prevq}}'){
+  case 'aq1':
+    value = "Heroes with Most Gold";
+    break;
+  case 'aq2':
+    value = "Heroes with Most Number of Denies";
+    break;
+  case 'aq3':
+    value = "Heroes that gained maximum Experience";
+    break;
+  case 'aq4':
+    value = "Heroes that gained Most Experience from the Creeps";
+    break;
+  case 'aq5':
+    value = "Heros performing Highest Stuns";
+    break;
+  case 'aq6':
+    value = "Regions having matches with the most positive votes";
+    break;
+  case 'aq7':
+    value = "Regions having matches with the most negative votes";
+    break;
+  default:
+    value = "NOT_DEFINED";
+}
+  document.getElementById('query_explain').innerHTML = value;
+</script>
+{% endif %}
 {% if prev_hero_name is defined %}
 <script>
 document.getElementById('hero_name').value = '{{prev_hero_name}}';
+</script>
+{% endif %}
+{% if success %}
+<script type="text/javascript">
+alert("Update Successful!")
 </script>
 {% endif %}
 <script>
@@ -659,7 +696,6 @@ function fillform2(query){
 <script>
 function getval(id){
   var password = prompt("Enter the admin password:","");
-  // this.form.elements['password'].value = password;
   document.getElementById(id).value=password;
   this.form.submit();
 }

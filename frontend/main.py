@@ -120,7 +120,7 @@ qdict = {
     ),
     "iq5":(
         ["Item Name"],["item_name"],
-        'select item_name from item_ids;'
+        'select item_name from item_ids order by item_name;'
     ),
 
     "aq1":(
@@ -318,19 +318,19 @@ def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = No
             else:
                 query = query[:83] +'where localized_name = \''+ hero_name +'\'\n' + query[84:]
                 print(query)
-        
+
         # Updation
         if query_num == "@uq1":
             temp_name = new_name
             temp_name.replace(" ", "_")
             query = """
             UPDATE hero_names
-            SET localized_name = '{}' , 
+            SET localized_name = '{}' ,
             name = 'npc_dota_hero_{}'
             WHERE localized_name = '{}'
             ;
             """.format(new_name, temp_name, old_name)
-        
+
         elif query_num == "@uq2":
             query = """
             UPDATE item_ids
@@ -347,16 +347,16 @@ def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = No
             query = """
             INSERT INTO hero_names(name, hero_id, localized_name)
             VALUES('npc_dota_hero_{}', (
-                select max(hero_id) from 
+                select max(hero_id) from
                 hero_names
             ) + 1, '{}');
             """.format(temp_name, new_name)
-        
+
         elif query_num == "@aq2":
             query = """
                 INSERT INTO item_ids(item_id, item_name)
                 VALUES((
-                    select max(item_id) from 
+                    select max(item_id) from
                     item_ids
                 ) + 1, '{}');
             """.format(new_name)
@@ -369,29 +369,29 @@ def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = No
             where localized_name = '{}'
             ;
             """.format(new_name)
-        
+
         elif query_num == "@dq2":
             query = """
             delete from item_ids
             where item_name = '{}'
             ;
             """.format(new_name)
-        
+
         elif query_num == "@dq3":
             query = """
             DELETE FROM match
             WHERE match_id={};
             """.format(new_name)
-        
+
         elif query_num == "@dq4":
             query = """
-            delete from match 
+            delete from match
             using cluster_regions
             where match.cluster = cluster_regions.cluster
             and cluster_regions.region = '{}'
             ;
             """.format(new_name)
-        
+
         elif query_num == "@dq5":
             query = """
             create materialized view match_accounts(match_id) as (
@@ -411,14 +411,14 @@ def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = No
 
             drop materialized view match_accounts;
             """.format(new_name)
-        
+
 
 
     else:
         print("[ ERROR ] - Query not in Dictionary")
         return (None,None)
-    conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
-    # conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
+    # conn = pg.connect(host='localhost',dbname='project_db', user='dronemist', port='5432', password='')
+    conn = pg.connect(host='localhost',dbname='project_db', user='dhull', port='5432', password='1234')
 
     data = None
     try:
@@ -426,7 +426,7 @@ def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = No
         cursor.execute(query)
         if query_num.startswith("@"):
             conn.commit()
-        else:    
+        else:
             data = cursor.fetchall()
     except (Exception, pg.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
@@ -479,36 +479,31 @@ def hero():
 
 @app.route('/update',methods=['POST'])
 def update():
-    # print("Hi")
-    print(request.form)
+    success = False
     if(request.form['password']=='1234'):
         if 'hero_name' in request.form:
             query_main("@uq1", old_name=request.form['hero_name'], new_name=request.form['new_name'])
         elif 'item_name' in request.form:
             query_main("@uq2", old_name=request.form['item_name'], new_name=request.form['new_name'])
-    else:
-        print("no update sorry")
-        # do stuff
-    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
+        success = True
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items(),success=success)
 
 @app.route('/add',methods=['POST'])
 def add():
     # print("Hi")
     print(request.form)
+    success = False
     if(request.form['password']=='1234'):
         if 'new_hero' in request.form:
             query_main("@aq1", new_name=request.form['new_hero'])
         elif 'new_item' in request.form:
             query_main("@aq2", new_name=request.form['new_item'])
-    else:
-        print("no update sorry")
-        # do stuff
-    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
+        success = True
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items(),success=success)
 
 @app.route('/delete',methods=['POST'])
 def delete():
-    # print("Hi")
-    print(request.form)
+    success = False
     if(request.form['password']=='1234'):
         if 'hero_name' in request.form:
             query_main("@dq1", new_name=request.form['hero_name'])
@@ -520,10 +515,8 @@ def delete():
             query_main("@dq4", new_name=request.form['region'])
         elif 'account_id' in request.form:
             query_main("@dq5", new_name=request.form['account_id'])
-    else:
-        print("no update sorry")
-        # do stuff
-    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
+        success=True
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items(),success=success)
 
 if __name__ == '__main__':
    app.run()
