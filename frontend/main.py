@@ -124,7 +124,7 @@ qdict = {
     ),
 
     "aq1":(
-        ["Hero Name", "Gold Left"],["localized_name","gold"],
+        ["Hero Name", "Gold Left"],["localized_name","gold_left"],
         'select localized_name, gold as gold_left\
         from player_hero\
         where gold > 15000\
@@ -276,10 +276,37 @@ qdict = {
         ) temp2, unnest(temp2.ability_order) with ordinality a(ability, nr)
         ;
         """
+    ),
+    "@uq1" : (
+        [], [], ''
+    ),
+    "@uq2" : (
+        [], [], ''
+    ),
+    "@aq1" : (
+        [], [], ''
+    ),
+    "@aq2" : (
+        [], [], ''
+    ),
+    "@dq1" : (
+        [], [], ''
+    ),
+    "@dq2" : (
+        [], [], ''
+    ),
+    "@dq3" : (
+        [], [], ''
+    ),
+    "@dq4" : (
+        [], [], ''
+    ),
+    "@dq5" : (
+        [], [], ''
     )
 }
 
-def query_main(query_num, sortby=None, hero_name=None, order=None):
+def query_main(query_num, sortby=None, hero_name=None, order=None, old_name = None, new_name = None):
     if(query_num in qdict.keys()):
         header,cols,query = qdict[query_num]
         if(sortby is not None):
@@ -291,6 +318,100 @@ def query_main(query_num, sortby=None, hero_name=None, order=None):
             else:
                 query = query[:83] +'where localized_name = \''+ hero_name +'\'\n' + query[84:]
                 print(query)
+        
+        # Updation
+        if query_num == "@uq1":
+            temp_name = new_name
+            temp_name.replace(" ", "_")
+            query = """
+            UPDATE hero_names
+            SET localized_name = '{}' , 
+            name = 'npc_dota_hero_{}'
+            WHERE localized_name = '{}'
+            ;
+            """.format(new_name, temp_name, old_name)
+        
+        elif query_num == "@uq2":
+            query = """
+            UPDATE item_ids
+            SET item_name = '{}'
+            WHERE item_name = '{}'
+            ;
+            """.format(new_name, old_name)
+            print(query)
+
+        # Addition
+        elif query_num == "@aq1":
+            temp_name = new_name
+            temp_name.replace(" ", "_")
+            query = """
+            INSERT INTO hero_names(name, hero_id, localized_name)
+            VALUES('npc_dota_hero_{}', (
+                select max(hero_id) from 
+                hero_names
+            ) + 1, '{}');
+            """.format(temp_name, new_name)
+        
+        elif query_num == "@aq2":
+            query = """
+                INSERT INTO item_ids(item_id, item_name)
+                VALUES((
+                    select max(item_id) from 
+                    item_ids
+                ) + 1, '{}');
+            """.format(new_name)
+            print(query)
+
+        # Deletion
+        elif query_num == "@dq1":
+            query = """
+            delete from hero_names
+            where localized_name = '{}'
+            ;
+            """.format(new_name)
+        
+        elif query_num == "@dq2":
+            query = """
+            delete from item_ids
+            where item_name = '{}'
+            ;
+            """.format(new_name)
+        
+        elif query_num == "@dq3":
+            query = """
+            DELETE FROM match
+            WHERE match_id={};
+            """.format(new_name)
+        
+        elif query_num == "@dq4":
+            query = """
+            delete from match 
+            using cluster_regions
+            where match.cluster = cluster_regions.cluster
+            and cluster_regions.region = '{}'
+            ;
+            """.format(new_name)
+        
+        elif query_num == "@dq5":
+            query = """
+            create materialized view match_accounts(match_id) as (
+                select match_id from
+                (
+                    select match.match_id, {} = any(array_agg(account_id)) as accounts
+                    from players, match
+                    where players.match_id = match.match_id
+                    group by match.match_id
+                ) as temp
+                where temp.accounts
+            )
+            ;
+            delete from match
+            using match_accounts
+            where match.match_id = match_accounts.match_id;
+
+            drop materialized view match_accounts;
+            """.format(new_name)
+        
 
 
     else:
@@ -303,7 +424,10 @@ def query_main(query_num, sortby=None, hero_name=None, order=None):
     try:
         cursor = conn.cursor()
         cursor.execute(query)
-        data = cursor.fetchall()
+        if query_num.startswith("@"):
+            conn.commit()
+        else:    
+            data = cursor.fetchall()
     except (Exception, pg.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
     finally:
@@ -313,8 +437,13 @@ def query_main(query_num, sortby=None, hero_name=None, order=None):
             return (header,data)
 
 all_heros_query = "hq6"
+all_items_query = "iq5"
 
 app = Flask(__name__)
+
+def get_all_items():
+    header, data = query_main(all_items_query)
+    return data
 
 def get_all_heros():
     header, data = query_main(all_heros_query)
@@ -322,13 +451,13 @@ def get_all_heros():
 
 @app.route('/')
 def home():
-    return render_template('index.html', all_heros = get_all_heros())
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
 
 @app.route('/query',methods=['POST'])
 def askquery():
     query = request.form['query']
     header,data = query_main(query)
-    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros())
+    return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros(),  all_items = get_all_items())
 
 @app.route('/query',methods=['GET'])
 def askquery_():
@@ -337,27 +466,64 @@ def askquery_():
     order = request.args['order']
     header,data = query_main(query,sortby,order=order)
     if(order=='desc'):
-        return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros())
+        return render_template('index.html',header=header,data = data,typequery=query[0],prevq=query, all_heros = get_all_heros(),  all_items = get_all_items())
     else:
-        return render_template('index.html',header=header,data = data,prevh = sortby,typequery=query[0],prevq=query, all_heros = get_all_heros())
+        return render_template('index.html',header=header,data = data,prevh = sortby,typequery=query[0],prevq=query, all_heros = get_all_heros(),  all_items = get_all_items())
 
 @app.route('/hero',methods=['POST'])
 def hero():
     query = request.form['query']
     hero_name = request.form['hero_name']
     header,data = query_main(query,hero_name = hero_name)
-    return render_template('index.html',header=header,data = data,typequery="hs",prev_hero_name=hero_name,prevq=query,all_heros = get_all_heros())
+    return render_template('index.html',header=header,data = data,typequery="hs",prev_hero_name=hero_name,prevq=query,all_heros = get_all_heros(),  all_items = get_all_items())
 
 @app.route('/update',methods=['POST'])
 def update():
     # print("Hi")
     print(request.form)
     if(request.form['password']=='1234'):
-        print("Do update")
+        if 'hero_name' in request.form:
+            query_main("@uq1", old_name=request.form['hero_name'], new_name=request.form['new_name'])
+        elif 'item_name' in request.form:
+            query_main("@uq2", old_name=request.form['item_name'], new_name=request.form['new_name'])
     else:
         print("no update sorry")
         # do stuff
-    return render_template('index.html', all_heros = get_all_heros())
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
+
+@app.route('/add',methods=['POST'])
+def add():
+    # print("Hi")
+    print(request.form)
+    if(request.form['password']=='1234'):
+        if 'new_hero' in request.form:
+            query_main("@aq1", new_name=request.form['new_hero'])
+        elif 'new_item' in request.form:
+            query_main("@aq2", new_name=request.form['new_item'])
+    else:
+        print("no update sorry")
+        # do stuff
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
+
+@app.route('/delete',methods=['POST'])
+def delete():
+    # print("Hi")
+    print(request.form)
+    if(request.form['password']=='1234'):
+        if 'hero_name' in request.form:
+            query_main("@dq1", new_name=request.form['hero_name'])
+        elif 'item_name' in request.form:
+            query_main("@dq2", new_name=request.form['item_name'])
+        elif 'match_id' in request.form:
+            query_main("@dq3", new_name=request.form['match_id'])
+        elif 'region' in request.form:
+            query_main("@dq4", new_name=request.form['region'])
+        elif 'account_id' in request.form:
+            query_main("@dq5", new_name=request.form['account_id'])
+    else:
+        print("no update sorry")
+        # do stuff
+    return render_template('index.html', all_heros = get_all_heros(), all_items = get_all_items())
 
 if __name__ == '__main__':
    app.run()

@@ -44,7 +44,9 @@ h_div {
     <a href="#hsquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Hero specific</a>
     <a href="#iquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Items</a>
     <a href="#aquery" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Achievements</a>
-    <a href="#updates" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Update/Add </a>
+    <a href="#updates" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Update </a>
+    <a href="#add" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Add </a>
+    <a href="#delete" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white"> Delete </a>
     <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Team</a>
 
   </div>
@@ -200,19 +202,21 @@ h_div {
   <input name="hero_name" id="hero_name_q" value="">
 </form>
 <!-- <br> -->
-<label for="queries">Choose a Hero:</label>
-{% if all_heros is defined %}
-<select name="hero_name" id="hero_name">
-<!-- <option value="null"></option> -->
-    {% for hero in all_heros %}
-    <option value="{{hero[0]}}">{{hero[0]}}</option>
-    {% endfor %}
-</select>
-{% else %}
-    <select name="query" id="query">
-    <option value="null"> No Heros available </option>
-  </select>
-{% endif %}
+<div class="w3-section">
+    <label for="hero_name">Choose a Hero:</label>
+    {% if all_heros is defined %}
+    <select name="hero_name" id="hero_name">
+    <!-- <option value="null"></option> -->
+        {% for hero in all_heros %}
+        <option value="{{hero[0]}}">{{hero[0]}}</option>
+        {% endfor %}
+    </select>
+    {% else %}
+        <select name="query" id="query">
+        <option value="null"> No Heros available </option>
+    </select>
+    {% endif %}
+</div>
 <div class="w3-bar w3-black">
   <button class="w3-bar-item w3-button" onclick="fillform2('hsq1')" id="hsq1">Most common item build</button>
   <button class="w3-bar-item w3-button" onclick="fillform2('hsq2')" id="hsq2">Hero against stats</button>
@@ -384,35 +388,57 @@ h_div {
     </div>
       <!-- <form action="/update_val" id="update_form"> -->
         <div  id="hero_update" style="display:none;">
-          <form action="/update" method="post" onsubmit="getval()">
+          <form action="/update" method="post" onsubmit="getval('pass1')">
           <div class="w3-section">
-            <label>Hero Name</label>
-            <input class="w3-input w3-border" type="text" name="Name" value="Name" required>
+            <label for ="hero_name">Select hero</label>
+            {% if all_heros is defined %}
+            <select name="hero_name" id="hero_name">
+            <!-- <option value="null"></option> -->
+                {% for hero in all_heros %}
+                <option value="{{hero[0]}}">{{hero[0]}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+                <select name="query" id="query">
+                <option value="null"> No Heros available </option>
+            </select>
+            {% endif %}
           </div>
           <div class="w3-section">
-            <label>Hero game name</label>
-            <input class="w3-input w3-border" type="text" name="Email" value="email" required>
+            <label>New Hero name</label>
+            <input class="w3-input w3-border" type="text" name="new_name" value="New Name" required>
           </div>
-          <input style="display: none;" name="password" type="text" value="" id="pass"/>
+          <input style="display: none;" name="password" type="text" value="" id="pass1"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
         </form>
         </div>
 
         <div  id="item_update" style="display:none;">
-          <form action="/update" method="post" onsubmit="getval()">
+          <form action="/update" method="post" onsubmit="getval('pass2')">
           <div class="w3-section">
-            <label>Item Name</label>
-            <input class="w3-input w3-border" type="text" name="Name" required>
+            <label for ="item_name">Select item</label>
+            {% if all_items is defined %}
+            <select name="item_name" id="item_name">
+            <!-- <option value="null"></option> -->
+                {% for item in all_items %}
+                <option value="{{item[0]}}">{{item[0]}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+                <select name="query" id="query">
+                <option value="null"> No Items available </option>
+            </select>
+            {% endif %}
           </div>
           <div class="w3-section">
-            <label>Item id</label>
-            <input class="w3-input w3-border" type="text" name="Email" required>
+            <label>New item name</label>
+            <input class="w3-input w3-border" type="text" name="new_name" required>
           </div>
-          <input style="display: none;" name="password" type="text" value="" id="pass"/>
+          <input style="display: none;" name="password" type="text" value="" id="pass2"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
         </div>
-        <div  id="player_update" style="display:none;">
+        <!-- <div  id="player_update" style="display:none;">
           <form action="/update" method="post" onsubmit="getval()">
           <div class="w3-section">
             <label>Name</label>
@@ -429,7 +455,138 @@ h_div {
           <input style="display: none;" name="password" type="text" value="" id="pass"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
+        </div> -->
+    </div>
+
+    <!-- Addition -->
+  <div class="w3-container" id="add" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Add.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+      <!-- <label for="update_domain">Choose a Query:</label> -->
+      <!-- <form>
+      <label for="cases">Choose a table:</label>
+      <select name="cases" id="cases">
+        <option value=""></option>
+        <option value="hero">Hero</option>
+        <option value="item">Item</option>
+        <option value="player">Player</option>
+      </select>
+    </form> -->
+    <div class="w3-bar w3-black">
+      <button class="w3-bar-item w3-button" onclick="showformadd('hero_add')">Hero Add</button>
+      <button class="w3-bar-item w3-button" onclick="showformadd('item_add')">Item Add</button>
+      <!-- <button class="w3-bar-item w3-button" onclick="showform('player_update')">Player Update</button> -->
+    </div>
+      <!-- <form action="/update_val" id="update_form"> -->
+        <div  id="hero_add" style="display:none;">
+          <form action="/add" method="post" onsubmit="getval('pass3')">
+          <div class="w3-section">
+            <label>New Hero name</label>
+            <input class="w3-input w3-border" type="text" name="new_hero" value="New Name" required>
+          </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass3"/>
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+        </form>
         </div>
+
+        <div  id="item_add" style="display:none;">
+          <form action="/add" method="post" onsubmit="getval('pass4')">
+          <div class="w3-section">
+            <label>New item name</label>
+            <input class="w3-input w3-border" type="text" name="new_item" required>
+          </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass4"/>
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+       </form>
+        </div>
+    </div>
+
+  <!-- Delete -->
+  <div class="w3-container" id="delete" style="margin-top:75px">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Delete.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <div class="w3-bar w3-black">
+      <button class="w3-bar-item w3-button" onclick="showformdelete('hero_delete')">Hero delete</button>
+      <button class="w3-bar-item w3-button" onclick="showformdelete('item_delete')">Item delete</button>
+      <button class="w3-bar-item w3-button" onclick="showformdelete('match_delete1')">Delete match with match id</button>
+      <button class="w3-bar-item w3-button" onclick="showformdelete('match_delete2')">Delete matches from a region</button>
+      <button class="w3-bar-item w3-button" onclick="showformdelete('match_delete3')">Delete matches played by a player</button>
+      <!-- <button class="w3-bar-item w3-button" onclick="showform('player_update')">Player Update</button> -->
+    </div>
+      <!-- <form action="/update_val" id="update_form"> -->
+        <div  id="hero_delete" style="display:none;">
+          <form action="/delete" method="post" onsubmit="getval('pass5')">
+          <div class="w3-section">
+            <label for ="hero_name">Select hero</label>
+            {% if all_heros is defined %}
+            <select name="hero_name" id="hero_name">
+            <!-- <option value="null"></option> -->
+                {% for hero in all_heros %}
+                <option value="{{hero[0]}}">{{hero[0]}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+                <select name="query" id="query">
+                <option value="null"> No Heros available </option>
+            </select>
+            {% endif %}
+          </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass5"/>
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+        </form>
+        </div>
+
+        <div  id="item_delete" style="display:none;">
+          <form action="/delete" method="post" onsubmit="getval('pass6')">
+          <div class="w3-section">
+            <label for ="item_name">Select item</label>
+            {% if all_items is defined %}
+            <select name="item_name" id="item_name">
+            <!-- <option value="null"></option> -->
+                {% for item in all_items %}
+                <option value="{{item[0]}}">{{item[0]}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+                <select name="query" id="query">
+                <option value="null"> No Items available </option>
+            </select>
+            {% endif %}
+          </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass6"/>
+          <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+       </form>
+        </div>
+        <div id="match_delete1" style="display:none;">
+            <form action="/delete" method="post" onsubmit="getval('pass7')">
+            <div class="w3-section">
+              <label>Enter match id to delete</label>
+              <input class="w3-input w3-border" type="text" name="match_id" required>
+            </div>
+            <input style="display: none;" name="password" type="text" value="" id="pass7"/>
+            <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+         </form>
+          </div>
+          <div id="match_delete2" style="display:none;">
+            <form action="/delete" method="post" onsubmit="getval('pass8')">
+            <div class="w3-section">
+              <label>Enter region of whose matches have to be deleted</label>
+              <input class="w3-input w3-border" type="text" name="region" required>
+            </div>
+            <input style="display: none;" name="password" type="text" value="" id="pass8"/>
+            <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+         </form>
+          </div>
+          <div id="match_delete3" style="display:none;">
+            <form action="/delete" method="post" onsubmit="getval('pass9')">
+            <div class="w3-section">
+              <label>Enter account id of whose matches have to be deleted</label>
+              <input class="w3-input w3-border" type="text" name="account_id" required>
+            </div>
+            <input style="display: none;" name="password" type="text" value="" id="pass9"/>
+            <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
+         </form>
+          </div>
     </div>
 
   <!-- Designers -->
@@ -500,20 +657,37 @@ function fillform2(query){
 }
 </script>
 <script>
-function getval(){
+function getval(id){
   var password = prompt("Enter the admin password:","");
-  // alert ("You entered: "+this.form.elements['name'].value);
   // this.form.elements['password'].value = password;
-  document.getElementById('pass').value=password;
+  document.getElementById(id).value=password;
   this.form.submit();
 }
 function showform(id) {
   // reset
   document.getElementById('hero_update').style.display='none';
   document.getElementById('item_update').style.display='none';
-  document.getElementById('player_update').style.display='none';
   document.getElementById(id).style.display="block";
 }
+// Show additon form
+function showformadd(id) {
+  // reset
+  document.getElementById('hero_add').style.display='none';
+  document.getElementById('item_add').style.display='none';
+  document.getElementById(id).style.display="block";
+}
+
+// Show deletion form
+function showformdelete(id) {
+  // reset
+  document.getElementById('hero_delete').style.display='none';
+  document.getElementById('item_delete').style.display='none';
+  document.getElementById('match_delete1').style.display='none';
+  document.getElementById('match_delete2').style.display='none';
+  document.getElementById('match_delete3').style.display='none';
+  document.getElementById(id).style.display="block";
+}
+
 </script>
 <script>
 // Quick and simple export target #table_id into a csv
