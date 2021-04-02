@@ -336,9 +336,13 @@ h_div {
 {% if header != None %}
 <thead>
   <tr>
-  {% for h in header %}
-  <th> {{h}} (<a href="/query?q={{prevq}}&sort={{h}}" >sort</a>) </th>
-  {% endfor %}
+    {% for h in header %}
+    {% if h == prevh %}
+      <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=desc" ><i class="material-icons w3-small">arrow_downward</i></a> </th>
+    {% else %}
+    <th> {{h}} <a href="/query?q={{prevq}}&sort={{h}}&order=asc" ><i class="material-icons w3-small">arrow_upward</i></a> </th>
+    {% endif %}
+    {% endfor %}
 </tr>
 </thead>
 {% endif %}
@@ -380,21 +384,22 @@ h_div {
     </div>
       <!-- <form action="/update_val" id="update_form"> -->
         <div  id="hero_update" style="display:none;">
-          <form action="/update" method="post">
+          <form action="/update" method="post" onsubmit="getval()">
           <div class="w3-section">
             <label>Hero Name</label>
-            <input class="w3-input w3-border" type="text" name="Name" required>
+            <input class="w3-input w3-border" type="text" name="Name" value="Name" required>
           </div>
           <div class="w3-section">
             <label>Hero game name</label>
-            <input class="w3-input w3-border" type="text" name="Email" required>
+            <input class="w3-input w3-border" type="text" name="Email" value="email" required>
           </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
         </form>
         </div>
 
         <div  id="item_update" style="display:none;">
-          <form action="/update" method="post">
+          <form action="/update" method="post" onsubmit="getval()">
           <div class="w3-section">
             <label>Item Name</label>
             <input class="w3-input w3-border" type="text" name="Name" required>
@@ -403,11 +408,12 @@ h_div {
             <label>Item id</label>
             <input class="w3-input w3-border" type="text" name="Email" required>
           </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
         </div>
         <div  id="player_update" style="display:none;">
-          <form action="/update" method="post">
+          <form action="/update" method="post" onsubmit="getval()">
           <div class="w3-section">
             <label>Name</label>
             <input class="w3-input w3-border" type="text" name="Name" required>
@@ -420,6 +426,7 @@ h_div {
             <label>Message</label>
             <input class="w3-input w3-border" type="text" name="Message" required>
           </div>
+          <input style="display: none;" name="password" type="text" value="" id="pass"/>
           <input type="submit" value="Submit" class="w3-button w3-white w3-border w3-border-red w3-round">
        </form>
         </div>
@@ -493,20 +500,13 @@ function fillform2(query){
 }
 </script>
 <script>
-// $('#cases').change(function () {
-// 	  var value = this.value;
-//     console.log(this.value);
-//         if(this.value==""){
-//       $('#hero_update').display.style = "none";
-//       $('#item_update').display.style = "none";
-//       $('#player_update').display.style = "none";
-//       return;
-//     }
-//     $('#hero_update').display.style = "none";
-//     $('#item_update').display.style = "none";
-//     $('#player_update').display.style = "none";
-//     $('#' + this.value+'_update').display.style = "block";
-// });
+function getval(){
+  var password = prompt("Enter the admin password:","");
+  // alert ("You entered: "+this.form.elements['name'].value);
+  // this.form.elements['password'].value = password;
+  document.getElementById('pass').value=password;
+  this.form.submit();
+}
 function showform(id) {
   // reset
   document.getElementById('hero_update').style.display='none';

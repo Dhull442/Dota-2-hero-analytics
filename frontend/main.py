@@ -350,7 +350,13 @@ def hero():
 
 @app.route('/update',methods=['POST'])
 def update():
-    print("Hi")
+    # print("Hi")
+    print(request.form)
+    if(request.form['password']=='1234'):
+        print("Do update")
+    else:
+        print("no update sorry")
+        # do stuff
     return render_template('index.html', all_heros = get_all_heros())
 
 if __name__ == '__main__':
